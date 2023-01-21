@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const mongodb = require("mongodb");
+// const mongodb = require("mongodb");
 const dotenv = require("dotenv");
 dotenv.config();
 const userRoute = require("./routes/user");
@@ -11,13 +11,13 @@ const orderRoute = require("./routes/order");
 const stripeRoute = require("./routes/stripe");
 const cors = require("cors");
 
-const MongoClient = mongodb.MongoClient
+// const MongoClient = mongodb.MongoClient
 
-const connectionParams = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  tls: true,
-}
+// const connectionParams = {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+//   tls: true,
+// }
 
 // mongoose
 //   .connect(process.env.MONGO_URL, connectionParams)
