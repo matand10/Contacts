@@ -62,8 +62,8 @@ router.get("/", async (req, res) => {
   try {
     const collection = await dbService.getCollection('product')
     const products = await collection.find({}).toArray()
-    console.log('products', products)
-    res.status(200).json(products);
+    // res.status(200).json(products);
+    res.json(products)
   } catch (err) {
     res.status(500).json(err);
     throw err
