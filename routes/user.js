@@ -53,16 +53,29 @@ router.get("/find/:id", verifyTokenAndAdmin, async (req, res) => {
 
 //GET ALL USER
 router.get("/", verifyTokenAndAdmin, async (req, res) => {
-  const query = req.query.new;
+  // const query = req.query.new;
+  console.log('Hello');
   try {
-    const users = query
-      ? await User.find().sort({ _id: -1 }).limit(5)
-      : await User.find();
-    res.status(200).json(users);
+    // const collection = await dbService.getCollection('board')
+    // const users = collection.find(criteria).toArray()
+    // console.log('users ==>> ', users)
+    // res.status(200).json(users);
   } catch (err) {
     res.status(500).json(err);
   }
 });
+
+// router.get("/", verifyTokenAndAdmin, async (req, res) => {
+//   const query = req.query.new;
+//   try {
+//     const users = query
+//       ? await User.find().sort({ _id: -1 }).limit(5)
+//       : await User.find();
+//     res.status(200).json(users);
+//   } catch (err) {
+//     res.status(500).json(err);
+//   }
+// });
 
 //GET USER STATS
 

@@ -3,6 +3,7 @@ const User = require("../models/User");
 const CryptoJS = require("crypto-js");
 const bcrypt = require('bcrypt')
 const jwt = require("jsonwebtoken");
+const dbService = require('../services/db.service')
 
 //REGISTER
 router.post("/register", async (req, res) => {
@@ -27,24 +28,27 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   const { username, password } = JSON.parse(req.body.data)
 
-  const user = await User.findOne({ username });
+  const collection = await dbService.getCollection('user')
+  const user = await collection.findOne({ username })
   if (!user) res.status(401).json("Wrong credentials!")
+  // const user = await User.findOne({ username });
   const match = await bcrypt.compare(password, user.password)
   if (!match) return Promise.reject('Invalid username or password')
-  res.status(200).json(user)
+  console.log('match', match)
+  // res.status(200).json(user)
 
-  const accessToken = jwt.sign(
-    {
-      id: user._id,
-      isAdmin: user.isAdmin,
-    },
-    process.env.JWT_SEC,
-    { expiresIn: "3d" }
-  );
+  // const accessToken = jwt.sign(
+  //   {
+  //     id: user._id,
+  //     isAdmin: user.isAdmin,
+  //   },
+  //   process.env.JWT_SEC,
+  //   { expiresIn: "3d" }
+  // );
 
-  const { pass, ...others } = user._doc;
-  res.status(200).json({ ...others, accessToken });
-  res.status(500).json(err);
+  // const { pass, ...others } = user._doc;
+  // res.status(200).json({ ...others, accessToken });
+  // res.status(500).json(err);
 });
 
 router.post("/logout", async (req, res) => {
