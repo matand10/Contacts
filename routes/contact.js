@@ -57,18 +57,29 @@ const router = require("express").Router();
 //   }
 // });
 
-//GET ALL PRODUCTS
+//GET ALL CONTACTS
 router.get("/", async (req, res) => {
   try {
     const collection = await dbService.getCollection('product')
-    const products = await collection.find({}).toArray()
-    // res.status(200).json(products);
-    res.json(products)
+    const contacts = await collection.find({}).toArray()
+    res.status(200).json(contacts)
   } catch (err) {
     res.status(500).json(err);
     throw err
   }
 });
+
+router.get("/:category", async (req, res) => {
+  const cat = req.params.category
+  try {
+    const collection = await dbService.getCollection(cat)
+    const entities = await collection.find({}).toArray()
+    res.status(200).json(entities)
+  } catch (err) {
+    res.status(500).json(err);
+    throw err
+  }
+})
 
 // router.get("/", async (req, res) => {
 //   const qNew = req.query.new;
