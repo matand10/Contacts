@@ -1,5 +1,6 @@
 // const Product = require("../models/Product");
-const dbService = require('../services/db.service')
+const dbService = require('../services/db.service');
+const { getFirstLetterUppercase } = require('../services/util.service');
 const {
   verifyToken,
   verifyTokenAndAuthorization,
@@ -72,8 +73,8 @@ router.get("/", async (req, res) => {
 router.get("/:category", async (req, res) => {
   const cat = req.params.category
   try {
-    const collection = await dbService.getCollection(cat)
-    const entities = await collection.find({}).toArray()
+    const collection = await dbService.getCollection('contact')
+    const entities = await collection.find({ desc: getFirstLetterUppercase(cat) }).toArray()
     res.status(200).json(entities)
   } catch (err) {
     res.status(500).json(err);
