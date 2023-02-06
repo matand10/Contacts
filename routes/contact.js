@@ -6,7 +6,7 @@ const {
   verifyTokenAndAuthorization,
   verifyTokenAndAdmin,
 } = require("./verifyToken");
-
+const ObjectId = require('mongodb').ObjectId
 const router = require("express").Router();
 
 //CREATE
@@ -49,14 +49,16 @@ const router = require("express").Router();
 // });
 
 // //GET PRODUCT
-// router.get("/find/:id", async (req, res) => {
-//   try {
-//     const product = await Product.findById(req.params.id);
-//     res.status(200).json(product);
-//   } catch (err) {
-//     res.status(500).json(err);
-//   }
-// });
+router.get("/find/:id", async (req, res) => {
+  const { id } = req.params
+  try {
+    const collection = await dbService.getCollection('contact')
+    const contact = await collection.findOne({ _id: ObjectId(id) })
+    res.status(200).json(contact);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 
 //GET ALL CONTACTS
 router.get("/", async (req, res) => {
