@@ -16,8 +16,6 @@ dotenv.config();
 const options = {
   key: fs.readFileSync(path.join(__dirname, 'certificates', 'key.pem')),
   cert: fs.readFileSync(path.join(__dirname, 'certificates', 'cert.pem'))
-  // key: fs.readFileSync('certificates/key.pem'),
-  // cert: fs.readFileSync('certificates/cert.pem')
 }
 
 app.use(cors());
