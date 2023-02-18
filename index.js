@@ -1,8 +1,11 @@
 const express = require("express");
+// const http = require('http')
 const https = require('https')
 const fs = require('fs')
 const app = express();
 const dotenv = require("dotenv");
+
+dotenv.config();
 const userRoute = require("./routes/user");
 const authRoute = require("./routes/auth");
 const contactRoute = require("./routes/contact");
@@ -11,7 +14,6 @@ const orderRoute = require("./routes/order");
 const stripeRoute = require("./routes/stripe");
 const cors = require("cors");
 const path = require("path");
-dotenv.config();
 
 const options = {
   key: fs.readFileSync(path.join(__dirname, 'certificates', 'key.pem')),
@@ -28,14 +30,8 @@ app.use("/api/orders", orderRoute);
 app.use("/api/checkout", stripeRoute);
 
 app.use(express.static('public'));
-// app.get('/**', (req, res) => {
-//   res.sendFile(path.resolve(__dirname, 'public', 'index.html'))
-// });
 
 const port = process.env.PORT || 80
+// const sslServer = http.createServer(app)
 const sslServer = https.createServer(options, app)
 sslServer.listen(port, () => console.log('Listening on port ' + port))
-
-// https.createServer(options, (req, res) => {
-//   res.end('SSL Added')
-// }).listen(port, () => console.log('Listening on port ' + port));

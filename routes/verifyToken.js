@@ -1,4 +1,7 @@
 const jwt = require("jsonwebtoken");
+const dbService = require('../services/db.service')
+const Cryptr = require('cryptr')
+const cryptr = new Cryptr(process.env.SECRET1 || 'Secret-Puk-1234')
 
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers.token;
@@ -14,6 +17,18 @@ const verifyToken = (req, res, next) => {
   }
 };
 
+function validateToken(loginToken) {
+  try {
+    const json = cryptr.decrypt(loginToken)
+    const loggedinUser = JSON.parse(json)
+    return loggedinUser
+  } catch (err) {
+    console.log('Invalid login token')
+  }
+  return null
+}
+
+
 const verifyTokenAndAuthorization = (req, res, next) => {
   verifyToken(req, res, () => {
     if (req.user.id === req.params.id || req.user.isAdmin) {
@@ -26,6 +41,7 @@ const verifyTokenAndAuthorization = (req, res, next) => {
 
 const verifyTokenAndAdmin = (req, res, next) => {
   verifyToken(req, res, () => {
+    console.log(req.user)
     if (req.user.isAdmin) {
       next();
     } else {
@@ -34,8 +50,22 @@ const verifyTokenAndAdmin = (req, res, next) => {
   });
 };
 
+const verifyAdmin = async (req, res, next) => {
+  const { username, isAdmin } = JSON.parse(req.body.data)
+  const collection = await dbService.getCollection('user')
+  const user = await collection.findOne({ username })
+
+  if (isAdmin && user.username === username) {
+    next();
+  } else {
+    res.status(403).json("You are not alowed to do that!");
+  }
+}
+
 module.exports = {
   verifyToken,
   verifyTokenAndAuthorization,
   verifyTokenAndAdmin,
+  verifyAdmin,
+  validateToken,
 };
