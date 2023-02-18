@@ -4,7 +4,10 @@ const CryptoJS = require("crypto-js");
 const bcrypt = require('bcrypt')
 const jwt = require("jsonwebtoken");
 const dbService = require('../services/db.service')
-const userService = require('../services/user.service')
+const userService = require('../services/user.service');
+const { verifyTokenAndAdmin, verifyAdmin } = require("./verifyToken");
+const Cryptr = require('cryptr')
+const cryptr = new Cryptr(process.env.SECRET1 || 'Secret-Puk-1234')
 
 //REGISTER
 router.post("/register", async (req, res) => {
@@ -14,6 +17,8 @@ router.post("/register", async (req, res) => {
     if (!username || !password) return Promise.reject('fullname, username and password are required!')
     const hash = await bcrypt.hash(password, saltRounds)
     let userToAdd = await userService.add({ username, password: hash, isAdmin: false, email })
+    const loginToken = getLoginToken(JSON.parse(req.body.data))
+    res.cookie('loginToken', loginToken)
     res.status(201).json(userToAdd);
   } catch (err) {
     res.status(500).json(err);
@@ -29,6 +34,8 @@ router.post("/login", async (req, res) => {
     if (!user) res.status(401).json("Wrong credentials!")
     const match = await bcrypt.compare(password, user.password)
     if (!match) return Promise.reject('Invalid username or password')
+    const loginToken = getLoginToken(JSON.parse(req.body.data))
+    res.cookie('loginToken', loginToken)
     // res.status(200).json(user)
 
     // const accessToken = jwt.sign(
@@ -49,10 +56,24 @@ router.post("/login", async (req, res) => {
 
 router.post("/logout", async (req, res) => {
   try {
+    res.clearCookie('loginToken')
     res.send({ msg: 'Logged out successfully' })
   } catch (err) {
     res.status(500).send({ err: 'Failed to logout' })
   }
 })
+
+router.post("/isAdmin", verifyAdmin, async (req, res) => {
+  try {
+    res.send({ status: 'ok' })
+  } catch (err) {
+    res.status(500).send({ err: 'Failed to verify' })
+  }
+})
+
+function getLoginToken(user) {
+  return cryptr.encrypt(JSON.stringify(user))
+}
+
 
 module.exports = router;
