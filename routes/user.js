@@ -1,11 +1,14 @@
+const { requireAdmin } = require("../middlewares/requireAuth.middleware");
 const User = require("../models/User");
+const dbService = require('../services/db.service')
 const {
-  verifyToken,
   verifyTokenAndAuthorization,
   verifyTokenAndAdmin,
+  verifyAdmin,
 } = require("./verifyToken");
 
 const router = require("express").Router();
+const ObjectId = require('mongodb').ObjectId
 
 //UPDATE
 router.put("/:id", verifyTokenAndAuthorization, async (req, res) => {
@@ -31,10 +34,12 @@ router.put("/:id", verifyTokenAndAuthorization, async (req, res) => {
 });
 
 //DELETE
-router.delete("/:id", verifyTokenAndAuthorization, async (req, res) => {
+router.post("/remove/:id", requireAdmin, async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.params.id);
-    res.status(200).json("User has been deleted...");
+    const { userId } = JSON.parse(req.body.data)
+    const collection = await dbService.getCollection('user')
+    await collection.deleteOne({ _id: ObjectId(userId) })
+    res.status(200).json({ status: 'ok', content: userId })
   } catch (err) {
     res.status(500).json(err);
   }
@@ -52,14 +57,11 @@ router.get("/find/:id", verifyTokenAndAdmin, async (req, res) => {
 });
 
 //GET ALL USER
-router.get("/", verifyTokenAndAdmin, async (req, res) => {
-  // const query = req.query.new;
-  console.log('Hello');
+router.post("/", verifyAdmin, async (req, res) => {
   try {
-    // const collection = await dbService.getCollection('board')
-    // const users = collection.find(criteria).toArray()
-    // console.log('users ==>> ', users)
-    // res.status(200).json(users);
+    const collection = await dbService.getCollection('user')
+    const users = await collection.find({}).toArray()
+    res.status(200).json(users);
   } catch (err) {
     res.status(500).json(err);
   }
@@ -78,27 +80,28 @@ router.get("/", verifyTokenAndAdmin, async (req, res) => {
 // });
 
 //GET USER STATS
-
-router.get("/stats", verifyTokenAndAdmin, async (req, res) => {
+router.post("/stats", verifyAdmin, async (req, res) => {
   const date = new Date();
   const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
-
   try {
-    const data = await User.aggregate([
-      { $match: { createdAt: { $gte: lastYear } } },
+    const collection = await dbService.getCollection('user');
+    const users = await collection.aggregate([
+      {
+        $match: { createdAt: { $gte: lastYear } }
+      },
       {
         $project: {
-          month: { $month: "$createdAt" },
-        },
+          month: { $month: "$createdAt" }
+        }
       },
       {
         $group: {
           _id: "$month",
-          total: { $sum: 1 },
-        },
-      },
-    ]);
-    res.status(200).json(data)
+          total: { $sum: 1 }
+        }
+      }
+    ]).toArray();
+    res.status(200).json(users)
   } catch (err) {
     res.status(500).json(err);
   }

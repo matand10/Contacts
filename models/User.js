@@ -5,13 +5,13 @@ const UserSchema = new mongoose.Schema(
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    isAdmin: {
-      type: Boolean,
-      default: false,
-    },
-    img: { type: String },
+    isAdmin: { type: Boolean, default: false, },
+    createdAt: { type: Date, default: new Date(), required: true },
+    updatedAt: { type: Date, default: null },
+    imgUrl: { type: String, default: null },
+    phone: { type: String, default: null },
+    adress: { type: String, default: null }
   },
-  { timestamps: true }
 );
 
 module.exports = mongoose.model("User", UserSchema);
