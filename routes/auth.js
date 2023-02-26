@@ -11,15 +11,23 @@ const cryptr = new Cryptr(process.env.SECRET1 || 'Secret-Puk-1234')
 
 //REGISTER
 router.post("/register", async (req, res) => {
-  const { email, username, password } = JSON.parse(req.body.data)
+  const user = JSON.parse(req.body.data)
   try {
     const saltRounds = 10
-    if (!username || !password) return Promise.reject('fullname, username and password are required!')
-    const hash = await bcrypt.hash(password, saltRounds)
-    let userToAdd = await userService.add({ username, password: hash, isAdmin: false, email })
-    const loginToken = getLoginToken(JSON.parse(req.body.data))
+    const hash = await bcrypt.hash(user.password, saltRounds)
+    const content = {
+      username: user.username,
+      password: hash,
+      fullName: `${user.name} ${user.lastName}`,
+      email: user.email
+    }
+    const newUser = new User(content)
+
+    if (!user.username || !user.password) return Promise.reject('fullname, username and password are required!')
+    let userToAdd = await userService.add(newUser)
+    const loginToken = getLoginToken(userToAdd)
     res.cookie('loginToken', loginToken)
-    res.status(201).json(userToAdd);
+    res.status(201).json({ status: 'ok' });
   } catch (err) {
     res.status(500).json(err);
   }
@@ -34,20 +42,9 @@ router.post("/login", async (req, res) => {
     if (!user) res.status(401).json("Wrong credentials!")
     const match = await bcrypt.compare(password, user.password)
     if (!match) return Promise.reject('Invalid username or password')
-    const loginToken = getLoginToken(JSON.parse(req.body.data))
-    res.cookie('loginToken', loginToken)
-    // res.status(200).json(user)
-
-    // const accessToken = jwt.sign(
-    //   {
-    //     id: user._id,
-    //     isAdmin: user.isAdmin,
-    //   },
-    //   process.env.JWT_SEC,
-    //   { expiresIn: "3d" }
-    // );
-    // const { pass, ...others } = user._doc;
+    const loginToken = getLoginToken(user)
     delete user.password
+    res.cookie('loginToken', loginToken)
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json(err);

@@ -1,10 +1,12 @@
 // const Product = require("../models/Product");
+const { requireAdmin } = require('../middlewares/requireAuth.middleware');
 const dbService = require('../services/db.service');
 const { getFirstLetterUppercase } = require('../services/util.service');
 const {
   verifyToken,
   verifyTokenAndAuthorization,
   verifyTokenAndAdmin,
+  verifyAdmin,
 } = require("./verifyToken");
 const ObjectId = require('mongodb').ObjectId
 const router = require("express").Router();
@@ -23,6 +25,20 @@ const router = require("express").Router();
 // });
 
 // //UPDATE
+router.post("/update/:id", requireAdmin, async (req, res) => {
+  const { contact } = JSON.parse(req.body.data)
+  try {
+    var id = ObjectId(contact._id)
+    delete contact._id
+    const collection = await dbService.getCollection('contact')
+    await collection.updateOne({ _id: id }, { $set: { ...contact } })
+    const updatedContact = await collection.findOne({ _id: ObjectId(id) })
+    res.status(200).json({ status: 'ok', content: updatedContact });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 // router.put("/:id", verifyTokenAndAdmin, async (req, res) => {
 //   try {
 //     const updatedProduct = await Product.findByIdAndUpdate(
@@ -39,22 +55,24 @@ const router = require("express").Router();
 // });
 
 // //DELETE
-// router.delete("/:id", verifyTokenAndAdmin, async (req, res) => {
-//   try {
-//     await Product.findByIdAndDelete(req.params.id);
-//     res.status(200).json("Product has been deleted...");
-//   } catch (err) {
-//     res.status(500).json(err);
-//   }
-// });
+router.post("/:id", requireAdmin, async (req, res) => {
+  try {
+    const { id } = JSON.parse(req.body.data)
+    const collection = await dbService.getCollection('contact')
+    await collection.deleteOne({ _id: ObjectId(id) })
+    res.status(200).json({ status: 'ok' });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 
-// //GET PRODUCT
+// //GET CONTACT
 router.get("/find/:id", async (req, res) => {
   const { id } = req.params
   try {
     const collection = await dbService.getCollection('contact')
     const contact = await collection.findOne({ _id: ObjectId(id) })
-    res.status(200).json(contact);
+    res.status(200).json({ status: 'ok', content: contact });
   } catch (err) {
     res.status(500).json(err);
   }
@@ -63,7 +81,7 @@ router.get("/find/:id", async (req, res) => {
 //GET ALL CONTACTS
 router.get("/", async (req, res) => {
   try {
-    const collection = await dbService.getCollection('product')
+    const collection = await dbService.getCollection('contact')
     const contacts = await collection.find({}).toArray()
     res.status(200).json(contacts)
   } catch (err) {

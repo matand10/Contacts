@@ -41,7 +41,6 @@ const verifyTokenAndAuthorization = (req, res, next) => {
 
 const verifyTokenAndAdmin = (req, res, next) => {
   verifyToken(req, res, () => {
-    console.log(req.user)
     if (req.user.isAdmin) {
       next();
     } else {
@@ -54,7 +53,6 @@ const verifyAdmin = async (req, res, next) => {
   const { username, isAdmin } = JSON.parse(req.body.data)
   const collection = await dbService.getCollection('user')
   const user = await collection.findOne({ username })
-
   if (isAdmin && user.username === username) {
     next();
   } else {
