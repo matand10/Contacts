@@ -50,10 +50,11 @@ const verifyTokenAndAdmin = (req, res, next) => {
 };
 
 const verifyAdmin = async (req, res, next) => {
-  const { username, isAdmin } = JSON.parse(req.body.data)
+  const { user } = JSON.parse(req.body.data)
+  const { username, isAdmin } = user
   const collection = await dbService.getCollection('user')
-  const user = await collection.findOne({ username })
-  if (isAdmin && user.username === username) {
+  const dbUser = await collection.findOne({ username })
+  if (isAdmin && dbUser.username === username) {
     next();
   } else {
     res.status(403).json("You are not alowed to do that!");

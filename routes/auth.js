@@ -44,7 +44,8 @@ router.post("/login", async (req, res) => {
     if (!match) return Promise.reject('Invalid username or password')
     const loginToken = getLoginToken(user)
     delete user.password
-    res.cookie('loginToken', loginToken)
+    res.cookie('myCookie', 'cookieValue', { maxAge: 900000, httpOnly: true });
+    // res.cookie('loginToken', loginToken)
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json(err);

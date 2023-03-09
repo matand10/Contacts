@@ -10,7 +10,9 @@ const UserSchema = new mongoose.Schema(
     updatedAt: { type: Date, default: null },
     imgUrl: { type: String, default: null },
     phone: { type: String, default: null },
-    adress: { type: String, default: null }
+    address: { type: String, default: null },
+    fullname: { type: String, default: null },
+    active: { type: Boolean, defaule: true }
   },
 );
 

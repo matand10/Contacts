@@ -1,11 +1,15 @@
 const { requireAdmin } = require("../middlewares/requireAuth.middleware");
 const User = require("../models/User");
 const dbService = require('../services/db.service')
+const userService = require('../services/user.service')
+const bcrypt = require('bcrypt')
 const {
   verifyTokenAndAuthorization,
   verifyTokenAndAdmin,
   verifyAdmin,
 } = require("./verifyToken");
+
+const { getUsersOneWeekAgo } = require('../services/util.service')
 
 const router = require("express").Router();
 const ObjectId = require('mongodb').ObjectId
@@ -45,6 +49,17 @@ router.post("/remove/:id", requireAdmin, async (req, res) => {
   }
 });
 
+//UPDATE
+router.post("/update", requireAdmin, async (req, res) => {
+  try {
+    const { userCred } = JSON.parse(req.body.data)
+    const savedUser = await userService.update(userCred)
+    res.status(200).json({ status: 'ok', content: savedUser })
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 //GET USER
 router.get("/find/:id", verifyTokenAndAdmin, async (req, res) => {
   try {
@@ -59,13 +74,52 @@ router.get("/find/:id", verifyTokenAndAdmin, async (req, res) => {
 //GET ALL USER
 router.post("/", verifyAdmin, async (req, res) => {
   try {
-    const collection = await dbService.getCollection('user')
-    const users = await collection.find({}).toArray()
+    const { filterBy } = JSON.parse(req.body.data)
+    const users = await userService.query(filterBy)
+    // const collection = await dbService.getCollection('user')
+    // let users = await collection.find({
+    //   createdAt: {
+    //     $gte: startOfMonth,
+    //     $lt: endOfMonth
+    //   }
+    // }).toArray()
+    // users = users.map((user) => {
+    //   delete user.password
+    //   return user
+    // })
+    // users = getUsersOneWeekAgo(users)
     res.status(200).json(users);
   } catch (err) {
     res.status(500).json(err);
   }
 });
+
+// CREATE USER
+router.post("/create", verifyAdmin, async (req, res) => {
+  try {
+    const { userCred } = JSON.parse(req.body.data)
+    const saltRounds = 10
+    const hash = await bcrypt.hash(userCred.password, saltRounds)
+    const content = {
+      username: userCred.username,
+      password: hash,
+      fullname: userCred.fullname,
+      email: userCred.email,
+      phone: userCred.phone,
+      address: userCred.address,
+      active: userCred.active
+    }
+    if (!userCred.username || !userCred.password) return Promise.reject('fullname, username and password are required!')
+    const newUser = new User(content)
+
+    const collection = await dbService.getCollection('user')
+    const addedUser = await collection.insertOne(newUser)
+
+    res.status(200).json({ status: 'ok', content: newUser })
+  } catch (err) {
+    res.status(500).json({ status: 'error' })
+  }
+})
 
 // router.get("/", verifyTokenAndAdmin, async (req, res) => {
 //   const query = req.query.new;

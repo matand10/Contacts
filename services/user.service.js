@@ -15,17 +15,13 @@ async function query(filterBy = {}) {
     const criteria = _buildCriteria(filterBy)
     try {
         const collection = await dbService.getCollection('user')
-        var users = await collection.find(criteria).toArray()
+        let users = await collection.find(criteria).toArray()
         users = users.map(user => {
             delete user.password
-            user.createdAt = ObjectId(user._id).getTimestamp()
-            // Returning fake fresh data
-            // user.createdAt = Date.now() - (1000 * 60 * 60 * 24 * 3) // 3 days ago
             return user
         })
         return users
     } catch (err) {
-        logger.error('cannot find users', err)
         throw err
     }
 }
@@ -34,10 +30,9 @@ async function getById(userId) {
     try {
         const collection = await dbService.getCollection('user')
         const user = await collection.findOne({ '_id': ObjectId(userId) })
-        // delete user.password
+        delete user.password
         return user
     } catch (err) {
-        logger.error(`while finding user ${userId}`, err)
         throw err
     }
 }
@@ -64,19 +59,20 @@ async function remove(userId) {
 
 async function update(user) {
     try {
-        // peek only updatable fields!
         const userToSave = {
+            ...user,
             _id: ObjectId(user._id),
             username: user.username,
             fullname: user.fullname,
-            boardIds: user.boardIds,
-            userImg: user.userImg
+            email: user.email,
+            phone: user.phone,
+            address: user.address,
         }
         const collection = await dbService.getCollection('user')
         await collection.updateOne({ '_id': userToSave._id }, { $set: userToSave })
+        delete userToSave.password
         return userToSave;
     } catch (err) {
-        logger.error(`cannot update user ${user._id}`, err)
         throw err
     }
 }
@@ -94,21 +90,11 @@ async function add(user) {
 
 function _buildCriteria(filterBy) {
     const criteria = {}
-    if (filterBy.txt) {
-        const txtCriteria = { $regex: filterBy.txt, $options: 'i' }
-        criteria.$or = [
-            {
-                username: txtCriteria
-            },
-            {
-                fullname: txtCriteria
-            }
-        ]
-    }
-    if (filterBy.minBalance) {
-        criteria.balance = { $gte: filterBy.minBalance }
+    if (filterBy.createdAt) {
+        criteria.createdAt = {
+            $gte: filterBy.createdAt.startOfWeek,
+            $lt: filterBy.createdAt.endOfWeek
+        }
     }
     return criteria
 }
-
-

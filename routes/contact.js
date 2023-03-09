@@ -1,6 +1,7 @@
 // const Product = require("../models/Product");
 const { requireAdmin } = require('../middlewares/requireAuth.middleware');
 const dbService = require('../services/db.service');
+const contactService = require('../services/contact.service')
 const { getFirstLetterUppercase } = require('../services/util.service');
 const {
   verifyToken,
@@ -12,17 +13,15 @@ const ObjectId = require('mongodb').ObjectId
 const router = require("express").Router();
 
 //CREATE
-
-// router.post("/", verifyTokenAndAdmin, async (req, res) => {
-//   const newProduct = new Product(req.body);
-
-//   try {
-//     const savedProduct = await newProduct.save();
-//     res.status(200).json(savedProduct);
-//   } catch (err) {
-//     res.status(500).json(err);
-//   }
-// });
+router.post("/create", requireAdmin, async (req, res) => {
+  try {
+    const { contact } = JSON.parse(req.body.data)
+    const savedContact = await contactService.add(contact)
+    res.status(200).json({ status: 'ok', content: savedContact });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 
 // //UPDATE
 router.post("/update/:id", requireAdmin, async (req, res) => {
