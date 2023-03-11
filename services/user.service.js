@@ -92,8 +92,8 @@ function _buildCriteria(filterBy) {
     const criteria = {}
     if (filterBy.createdAt) {
         criteria.createdAt = {
-            $gte: filterBy.createdAt.startOfWeek,
-            $lt: filterBy.createdAt.endOfWeek
+            $gte: new Date(filterBy.createdAt.startOfWeek),
+            $lt: new Date(filterBy.createdAt.endOfWeek)
         }
     }
     return criteria

@@ -61,11 +61,11 @@ router.post("/update", requireAdmin, async (req, res) => {
 });
 
 //GET USER
-router.get("/find/:id", verifyTokenAndAdmin, async (req, res) => {
+router.post("/find/:id", requireAdmin, async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    const { password, ...others } = user._doc;
-    res.status(200).json(others);
+    const { userId } = JSON.parse(req.body.data)
+    const user = await userService.getById(userId)
+    res.status(200).json({ status: 'ok', content: user });
   } catch (err) {
     res.status(500).json(err);
   }
@@ -76,18 +76,6 @@ router.post("/", verifyAdmin, async (req, res) => {
   try {
     const { filterBy } = JSON.parse(req.body.data)
     const users = await userService.query(filterBy)
-    // const collection = await dbService.getCollection('user')
-    // let users = await collection.find({
-    //   createdAt: {
-    //     $gte: startOfMonth,
-    //     $lt: endOfMonth
-    //   }
-    // }).toArray()
-    // users = users.map((user) => {
-    //   delete user.password
-    //   return user
-    // })
-    // users = getUsersOneWeekAgo(users)
     res.status(200).json(users);
   } catch (err) {
     res.status(500).json(err);
