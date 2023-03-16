@@ -39,8 +39,11 @@ app.use("/api/product", productRoute);
 app.use("/api/carts", cartRoute);
 app.use("/api/orders", orderRoute);
 app.use("/api/checkout", stripeRoute);
-
 app.use(express.static('public'));
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/index.html'));
+});
 
 const port = process.env.PORT || 80
 // const sslServer = http.createServer(app)
