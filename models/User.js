@@ -12,7 +12,8 @@ const UserSchema = new mongoose.Schema(
     phone: { type: String, default: null },
     address: { type: String, default: null },
     fullname: { type: String, default: null },
-    active: { type: Boolean, defaule: true }
+    active: { type: Boolean, defaule: true },
+    title: { type: String, defaule: null },
   },
 );
 

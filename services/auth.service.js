@@ -1,5 +1,6 @@
 const Cryptr = require('cryptr')
 const cryptr = new Cryptr(process.env.SECRET1 || 'Secret-Puk-1234')
+const dbService = require('./db.service')
 
 function validateToken(loginToken) {
     try {
@@ -12,6 +13,17 @@ function validateToken(loginToken) {
     return null
 }
 
+async function login(username) {
+    try {
+        const collection = await dbService.getCollection('user')
+        const user = await collection.findOne({ username })
+        return user
+    } catch (err) {
+        throw err
+    }
+}
+
 module.exports = {
-    validateToken
+    validateToken,
+    login,
 }

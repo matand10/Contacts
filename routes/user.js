@@ -61,7 +61,7 @@ router.post("/update", requireAdmin, async (req, res) => {
 });
 
 //GET USER
-router.post("/find/:id", requireAdmin, async (req, res) => {
+router.post("/find/:id", async (req, res) => {
   try {
     const { userId } = JSON.parse(req.body.data)
     const user = await userService.getById(userId)

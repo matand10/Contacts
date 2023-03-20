@@ -1,6 +1,6 @@
 const express = require("express");
-// const http = require('http')
-const https = require('https')
+const http = require('http')
+// const https = require('https')
 const fs = require('fs')
 const app = express();
 const dotenv = require("dotenv");
@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 dotenv.config();
 const userRoute = require("./routes/user");
 const authRoute = require("./routes/auth");
+const categoryRoute = require("./routes/category")
 const contactRoute = require("./routes/contact");
 const cartRoute = require("./routes/cart");
 const orderRoute = require("./routes/order");
@@ -33,6 +34,7 @@ const options = {
 app.use(cookieParser());
 app.use(express.json());
 app.use("/api/auth", authRoute);
+app.use("/api/categories", categoryRoute);
 app.use("/api/users", userRoute);
 app.use("/api/contacts", contactRoute);
 app.use("/api/product", productRoute);
@@ -46,6 +48,6 @@ app.get('*', (req, res) => {
 });
 
 const port = process.env.PORT || 80
-// const sslServer = http.createServer(app)
-const sslServer = https.createServer(options, app)
+const sslServer = http.createServer(app)
+// const sslServer = https.createServer(options, app)
 sslServer.listen(port, () => console.log('Listening on port ' + port))

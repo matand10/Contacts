@@ -2,11 +2,11 @@ const mongoose = require("mongoose");
 
 const ContactSchema = new mongoose.Schema(
     {
-        title: { type: String, required: true, unique: true },
+        company: { type: String, required: true },
         desc: { type: String, required: true },
-        countries: { type: Array, required: false, default: [] },
-        categories: { type: Array, required: false, default: [] },
-        jobTitle: { type: Array, required: false, default: [] },
+        country: { type: String, required: false, default: null },
+        category: { type: String, required: false, default: null },
+        jobTitle: { type: String, required: false, default: null },
         price: { type: Number, required: false, default: 0 },
         inStock: { type: Boolean, required: false, default: false },
         name: { type: String, required: false, default: null },
@@ -16,7 +16,7 @@ const ContactSchema = new mongoose.Schema(
         phone: { type: Array, required: false, default: [] },
         linkedinLinks: { type: Array, required: false, default: [] },
         agents: { type: Array, required: false, default: [] },
-        img: { type: String, required: false },
+        img: { type: String, required: false, default: null },
         createdAt: { type: Date, required: true, default: new Date() },
     },
 );
