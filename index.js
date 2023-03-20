@@ -1,6 +1,6 @@
 const express = require("express");
-const http = require('http')
-// const https = require('https')
+// const http = require('http')
+const https = require('https')
 const fs = require('fs')
 const app = express();
 const dotenv = require("dotenv");
@@ -21,7 +21,7 @@ const path = require("path");
 
 
 const corsOptions = {
-    origin: ['http://127.0.0.1:8080', 'http://localhost:8080', 'http://127.0.0.1:3000', 'http://localhost:3000', 'https://164.92.245.54:80', 'https://qleads.info:80'],
+    origin: ['http://127.0.0.1:8080', 'http://localhost:8080', 'http://127.0.0.1:3000', 'http://localhost:3000', 'https://164.92.245.54:80', 'https://qleads.info:80', 'https://qleads.info'],
     credentials: true
 }
 app.use(cors(corsOptions))
@@ -48,6 +48,6 @@ app.get('*', (req, res) => {
 });
 
 const port = process.env.PORT || 80
-const sslServer = http.createServer(app)
-// const sslServer = https.createServer(options, app)
+// const sslServer = http.createServer(app)
+const sslServer = https.createServer(options, app)
 sslServer.listen(port, () => console.log('Listening on port ' + port))
