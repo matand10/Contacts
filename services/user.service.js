@@ -67,7 +67,8 @@ async function update(user) {
             email: user.email,
             phone: user.phone,
             address: user.address,
-            favorites: user.favorites
+            favorites: user.favorites,
+            imgUrl: user.imgUrl
         }
         const collection = await dbService.getCollection('user')
         await collection.updateOne({ '_id': userToSave._id }, { $set: userToSave })

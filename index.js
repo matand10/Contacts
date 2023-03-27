@@ -15,6 +15,7 @@ const cartRoute = require("./routes/cart");
 const orderRoute = require("./routes/order");
 const stripeRoute = require("./routes/stripe");
 const productRoute = require("./routes/product");
+const uploadRoute = require('./routes/uploadFile')
 const cors = require("cors");
 const path = require("path");
 
@@ -41,6 +42,7 @@ app.use("/api/product", productRoute);
 app.use("/api/carts", cartRoute);
 app.use("/api/orders", orderRoute);
 app.use("/api/checkout", stripeRoute);
+app.use('/api/file', uploadRoute)
 app.use(express.static('public'));
 
 app.get('*', (req, res) => {
