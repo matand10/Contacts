@@ -1,3 +1,4 @@
+const Category = require('../models/Category')
 const dbService = require('./db.service')
 const ObjectId = require('mongodb').ObjectId
 
@@ -24,7 +25,33 @@ async function update(category) {
     }
 }
 
+async function remove(catId) {
+    try {
+        const collection = await dbService.getCollection('category')
+        await collection.deleteOne({ '_id': ObjectId(catId) })
+    } catch (err) {
+        throw err
+    }
+}
+
+async function add(category) {
+    try {
+        const catToSave = {
+            title: category.title,
+            cat: category.title.toLowerCase()
+        }
+        const newCategory = new Category(catToSave)
+        const collection = await dbService.getCollection('category')
+        await collection.insertOne(newCategory)
+        return newCategory
+    } catch (err) {
+        throw err
+    }
+}
+
 module.exports = {
     get,
     update,
+    add,
+    remove,
 }

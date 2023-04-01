@@ -1,13 +1,15 @@
-const { requireAdmin } = require("../middlewares/requireAuth.middleware");
 const router = require("express").Router();
 const categoryService = require("../services/category.service")
+const jobTitleService = require("../services/jobTitle.service")
+const companyService = require("../services/company.service")
+const territoryService = require("../services/territory.service")
 
 //CREATE
 router.post("/create", async (req, res) => {
     try {
         const { category } = JSON.parse(req.body.data)
-        await categoryService.update(category)
-        res.status(200).json({ status: 'ok' });
+        const savedCategory = await categoryService.add(category)
+        res.status(200).json({ status: 'ok', content: savedCategory });
     } catch (err) {
         res.status(500).json(err);
     }
@@ -27,8 +29,8 @@ router.post("/update/:id", async (req, res) => {
 // //DELETE
 router.post("/:id", async (req, res) => {
     try {
-        const { catId, option } = JSON.parse(req.body.data)
-        await categoryService.removeCategory(catId, option)
+        const { id } = JSON.parse(req.body.data)
+        await categoryService.remove(id)
         res.status(200).json({ status: 'ok' });
     } catch (err) {
         res.status(500).json(err);
@@ -45,5 +47,19 @@ router.get("/", async (req, res) => {
         throw err
     }
 });
+
+router.get("/all-categories", async (req, res) => {
+    try {
+        const categories = await categoryService.get()
+        const jobTitles = await jobTitleService.get()
+        const companies = await companyService.get()
+        const territories = await territoryService.get()
+
+        res.status(200).json({ status: 'ok', content: { categories, jobTitles, companies, territories } })
+    } catch (err) {
+        res.status(500).json(err);
+        throw err
+    }
+})
 
 module.exports = router;
