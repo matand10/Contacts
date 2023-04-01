@@ -25,7 +25,7 @@ const path = require("path");
 
 
 const corsOptions = {
-    origin: ['http://127.0.0.1:8080', 'http://localhost:8080', 'http://127.0.0.1:3000', 'http://localhost:3000', 'https://164.92.245.54:80', 'https://qleads.info:80', 'https://qleads.info'],
+    origin: ['http://127.0.0.1:8080', 'http://localhost:8080', 'http://127.0.0.1:3000', 'http://localhost:3000', 'https://164.92.245.54:80', 'https://qleads.info:80', 'https://qleads.info', 'http://qleads.info', 'http://qleads.info:80'],
     credentials: true
 }
 app.use(cors(corsOptions))
