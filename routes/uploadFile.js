@@ -15,7 +15,6 @@ router.post("/upload", upload, async (req, res) => {
 router.get("/get", async (req, res) => {
     try {
         const images = await Image.find()
-        console.log('images', images)
         res.status(200).send({ status: 'ok' })
     } catch (err) {
         res.status(500).send({ err: 'Failed to upload files' })

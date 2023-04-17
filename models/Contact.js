@@ -7,7 +7,7 @@ const ContactSchema = new mongoose.Schema(
         country: { type: String, required: false, default: null },
         category: { type: String, required: false, default: null },
         jobTitle: { type: String, required: false, default: null },
-        price: { type: Number, required: false, default: 0 },
+        price: { type: Number, required: false, default: 20 },
         inStock: { type: Boolean, required: false, default: false },
         name: { type: String, required: false, default: null },
         familyName: { type: String, required: false, default: null },

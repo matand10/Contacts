@@ -1,6 +1,9 @@
+const { CREDIT_VALIE } = require('../constants/credit')
+
 module.exports = {
     getFirstLetterUppercase,
-    getUsersOneWeekAgo
+    getUsersOneWeekAgo,
+    getTransactionsContactValueInCredit
 }
 
 
@@ -15,4 +18,12 @@ function getUsersOneWeekAgo(users) {
         const joinDate = new Date(user.createdAt).getTime(); // convert the join date to a timestamp
         return joinDate >= oneWeekAgo && joinDate < Date.now(); // check if the join date falls within the past week
     });
+}
+
+function getTransactionsContactValueInCredit(contactTransactions) {
+    let amount = 0
+    contactTransactions.forEach(trans => {
+        amount += (trans.price / CREDIT_VALIE)
+    })
+    return amount
 }

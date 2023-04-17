@@ -9,8 +9,6 @@ const {
   verifyAdmin,
 } = require("./verifyToken");
 
-const { getUsersOneWeekAgo } = require('../services/util.service')
-
 const router = require("express").Router();
 const ObjectId = require('mongodb').ObjectId
 
@@ -50,10 +48,10 @@ router.post("/remove/:id", requireAdmin, async (req, res) => {
 });
 
 //UPDATE
-router.post("/update", requireAdmin, async (req, res) => {
+router.post("/update", verifyTokenAndAdmin, async (req, res) => {
   try {
-    const { userCred } = JSON.parse(req.body.data)
-    const savedUser = await userService.update(userCred)
+    const { updatedUser } = JSON.parse(req.body.data)
+    const savedUser = await userService.update(updatedUser)
     res.status(200).json({ status: 'ok', content: savedUser })
   } catch (err) {
     res.status(500).json(err);
@@ -72,11 +70,11 @@ router.post("/find/:id", async (req, res) => {
 });
 
 //GET ALL USER
-router.post("/", verifyAdmin, async (req, res) => {
+router.post("/", verifyTokenAndAdmin, async (req, res) => {
   try {
     const { filterBy } = JSON.parse(req.body.data)
     const users = await userService.query(filterBy)
-    res.status(200).json(users);
+    res.status(200).json({ status: 'ok', content: users });
   } catch (err) {
     res.status(500).json(err);
   }

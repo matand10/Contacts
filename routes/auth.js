@@ -12,14 +12,14 @@ const cryptr = new Cryptr(process.env.SECRET1 || 'Secret-Puk-1234')
 
 //REGISTER
 router.post("/register", async (req, res) => {
-  const user = JSON.parse(req.body.data)
   try {
+    const user = JSON.parse(req.body.data)
     const saltRounds = 10
     const hash = await bcrypt.hash(user.password, saltRounds)
     const content = {
       username: user.username,
       password: hash,
-      fullName: `${user.name} ${user.lastName}`,
+      fullname: user.fullname,
       email: user.email
     }
     const newUser = new User(content)
@@ -39,12 +39,11 @@ router.post("/login", async (req, res) => {
   const { username, password } = JSON.parse(req.body.data)
   try {
     const user = await authService.login(username)
-    if (!user) res.status(401).json("Wrong credentials!")
+    if (!user) return res.status(401).json("Wrong credentials!")
     const match = await bcrypt.compare(password, user.password)
-    if (!match) res.status(401).json("Wrong credentials!")
+    if (!match) return res.status(401).json("Wrong credentials!")
     const loginToken = getLoginToken(user)
     delete user.password
-    // res.cookie('myCookie', 'cookieValue', { maxAge: 900000, httpOnly: true });
     res.cookie('loginToken', loginToken)
     res.status(200).json(user);
   } catch (err) {

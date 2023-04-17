@@ -14,6 +14,10 @@ const UserSchema = new mongoose.Schema(
     fullname: { type: String, default: null },
     active: { type: Boolean, defaule: true },
     title: { type: String, defaule: null },
+    favorites: { type: Array, defaule: [] },
+    credits: { type: Number, default: 0, },
+    creditTransactions: { type: Array, default: [] },
+    contactTransactions: { type: Array, default: [] },
   },
 );
 

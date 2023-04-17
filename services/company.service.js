@@ -31,7 +31,6 @@ async function add(company) {
             company: company.title,
             category: company.category
         }
-        console.log('companyToSave', companyToSave)
         const savedCompany = new Company(companyToSave)
         const collection = await dbService.getCollection('company')
         await collection.insertOne(savedCompany)
