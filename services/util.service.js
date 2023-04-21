@@ -21,9 +21,10 @@ function getUsersOneWeekAgo(users) {
 }
 
 function getTransactionsContactValueInCredit(contactTransactions) {
-    let amount = 0
-    contactTransactions.forEach(trans => {
-        amount += (trans.price / CREDIT_VALIE)
-    })
-    return amount
+    return contactTransactions.price / CREDIT_VALIE
+    // let amount = 0
+    // contactTransactions.forEach(trans => {
+    //     amount += (trans.price / CREDIT_VALIE)
+    // })
+    // return amount
 }

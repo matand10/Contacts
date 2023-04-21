@@ -1,10 +1,12 @@
 const express = require("express");
-// const http = require('http')
-const https = require('https')
+const http = require('http')
+// const https = require('https')
 const fs = require('fs')
 const app = express();
 const dotenv = require("dotenv");
 const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
 
 dotenv.config();
 const userRoute = require("./routes/user");
@@ -37,7 +39,6 @@ const options = {
     cert: fs.readFileSync(path.join(__dirname, 'certificates', 'cert.pem'))
 }
 
-app.use(cookieParser());
 app.use(express.json());
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
@@ -60,6 +61,6 @@ app.get('*', (req, res) => {
 });
 
 const port = process.env.PORT || 80
-// const sslServer = http.createServer(app)
-const sslServer = https.createServer(options, app)
+const sslServer = http.createServer(app)
+// const sslServer = https.createServer(options, app)
 sslServer.listen(port, () => console.log('Listening on port ' + port))

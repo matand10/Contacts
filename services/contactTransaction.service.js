@@ -27,13 +27,14 @@ async function update(entity) {
     }
 }
 
-async function add(credits) {
+async function add(credit) {
     try {
         collection = await dbService.getCollection(COLLECTION_KEY)
-        await Promise.all(
-            credits.map(credit => collection.insertOne(credit))
-        )
-        return credits
+        await collection.insertOne(credit)
+        // await Promise.all(
+        //     credits.map(credit => collection.insertOne(credit))
+        // )
+        return credit
     } catch (err) {
         throw err
     }

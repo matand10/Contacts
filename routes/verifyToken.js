@@ -17,7 +17,7 @@ const cryptr = new Cryptr(process.env.SECRET1 || 'Secret-Puk-1234')
 //   }
 // }
 
-const verifyToken = (req) => {
+const verifyToken = (req, res, next) => {
   const json = cryptr.decrypt(req.cookies.loginToken)
   return JSON.parse(json)
 };
@@ -41,7 +41,9 @@ const verifyTokenAndAuthorization = (req, res, next) => {
 };
 
 const verifyTokenAndAdmin = (req, res, next) => {
+  console.log(req)
   const currUser = verifyToken(req)
+  console.log(currUser)
   if (currUser.isAdmin) next()
   else res.status(403).json("You are not alowed to do that!")
 };
@@ -68,8 +70,30 @@ const verifyAdmin = async (req, res, next) => {
   }
 }
 
+
+
+const verifyToken2 = (req, res, next) => {
+  const loginToken = req.cookies.loginToken;
+  console.log('req', req)
+  if (!loginToken) {
+    return res.status(401).json("Authentication failed: no token found");
+  }
+
+  try {
+    const decryptedToken = cryptr.decrypt(loginToken);
+    const user = JSON.parse(decryptedToken);
+    req.user = user;
+    return next();
+  } catch (err) {
+    return res.status(401).json("Authentication failed: invalid token");
+  }
+};
+
+
+
 module.exports = {
   verifyToken,
+  verifyToken2,
   verifyTokenAndAuthorization,
   verifyTokenAndAdmin,
   verifyAdmin,

@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const dbService = require('../services/db.service')
 const userService = require('../services/user.service');
 const authService = require('../services/auth.service')
-const { verifyTokenAndAdmin, verifyAdmin } = require("./verifyToken");
+const { verifyToken2 } = require("./verifyToken");
 const Cryptr = require('cryptr')
 const cryptr = new Cryptr(process.env.SECRET1 || 'Secret-Puk-1234')
 
@@ -60,7 +60,7 @@ router.post("/logout", async (req, res) => {
   }
 })
 
-router.post("/isAdmin", verifyAdmin, async (req, res) => {
+router.post("/isAdmin", verifyToken2, async (req, res) => {
   try {
     res.send({ status: 'ok' })
   } catch (err) {

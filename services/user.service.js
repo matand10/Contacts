@@ -112,16 +112,19 @@ async function addCreditTransaction(transactions) {
     }
 }
 
-async function addContactTransaction(transactions, user) {
+async function addContactTransaction(transaction, user) {
     try {
         let savedUser
-        await Promise.all(
-            transactions.map(async transaction => {
-                const updatedUser = _updatePurchase(user, transaction)
-                await update(updatedUser)
-                savedUser = { status: 'success', updatedUser }
-            })
-        )
+        const updatedUser = _updatePurchase(user, transaction)
+        await update(updatedUser)
+        savedUser = { status: 'success', updatedUser }
+        // await Promise.all(
+        //     transactions.map(async transaction => {
+        //         const updatedUser = _updatePurchase(user, transaction)
+        //         await update(updatedUser)
+        //         savedUser = { status: 'success', updatedUser }
+        //     })
+        // )
         return savedUser
     } catch (err) {
         throw err
