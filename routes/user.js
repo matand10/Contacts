@@ -1,4 +1,3 @@
-const { requireAdmin } = require("../middlewares/requireAuth.middleware");
 const User = require("../models/User");
 const dbService = require('../services/db.service')
 const userService = require('../services/user.service')
@@ -7,10 +6,10 @@ const {
   verifyTokenAndAuthorization,
   verifyTokenAndAdmin,
   verifyAdmin,
+  verifyToken,
 } = require("./verifyToken");
 
 const router = require("express").Router();
-const ObjectId = require('mongodb').ObjectId
 
 //UPDATE
 router.put("/:id", verifyTokenAndAuthorization, async (req, res) => {
@@ -47,7 +46,7 @@ router.post("/remove/:id", verifyTokenAndAdmin, async (req, res) => {
 });
 
 //UPDATE
-router.post("/update", verifyTokenAndAdmin, async (req, res) => {
+router.post("/update", verifyToken, async (req, res) => {
   try {
     const { updatedUser } = req.body
     const savedUser = await userService.update(updatedUser)
