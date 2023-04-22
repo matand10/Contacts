@@ -7,7 +7,7 @@ const territoryService = require("../services/territory.service")
 //CREATE
 router.post("/create", async (req, res) => {
     try {
-        const { category } = JSON.parse(req.body.data)
+        const { category } = req.body
         const savedCategory = await categoryService.add(category)
         res.status(200).json({ status: 'ok', content: savedCategory });
     } catch (err) {
@@ -18,7 +18,7 @@ router.post("/create", async (req, res) => {
 // //UPDATE
 router.post("/update/:id", async (req, res) => {
     try {
-        const { category } = JSON.parse(req.body.data)
+        const { category } = req.body
         await categoryService.update(category)
         res.status(200).json({ status: 'ok' });
     } catch (err) {
@@ -29,7 +29,7 @@ router.post("/update/:id", async (req, res) => {
 // //DELETE
 router.post("/:id", async (req, res) => {
     try {
-        const { id } = JSON.parse(req.body.data)
+        const { id } = req.body
         await categoryService.remove(id)
         res.status(200).json({ status: 'ok' });
     } catch (err) {

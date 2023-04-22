@@ -1,14 +1,11 @@
 const router = require("express").Router();
 const User = require("../models/User");
-const CryptoJS = require("crypto-js");
 const bcrypt = require('bcrypt')
-const jwt = require("jsonwebtoken");
-const dbService = require('../services/db.service')
 const userService = require('../services/user.service');
 const authService = require('../services/auth.service')
-const { verifyToken2 } = require("./verifyToken");
 const Cryptr = require('cryptr')
 const cryptr = new Cryptr(process.env.SECRET1 || 'Secret-Puk-1234')
+const { verifyTokenAndAdmin } = require("./verifyToken");
 
 //REGISTER
 router.post("/register", async (req, res) => {
@@ -36,7 +33,7 @@ router.post("/register", async (req, res) => {
 
 //LOGIN
 router.post("/login", async (req, res) => {
-  const { username, password } = JSON.parse(req.body.data)
+  const { username, password } = req.body
   try {
     const user = await authService.login(username)
     if (!user) return res.status(401).json("Wrong credentials!")
@@ -60,7 +57,7 @@ router.post("/logout", async (req, res) => {
   }
 })
 
-router.post("/isAdmin", verifyToken2, async (req, res) => {
+router.post("/isAdmin", verifyTokenAndAdmin, async (req, res) => {
   try {
     res.send({ status: 'ok' })
   } catch (err) {
@@ -69,7 +66,7 @@ router.post("/isAdmin", verifyToken2, async (req, res) => {
 })
 
 function getLoginToken(user) {
-  return cryptr.encrypt(JSON.stringify(user))
+  return cryptr.encrypt(JSON.stringify({ _id: user._id, isAdmin: user.isAdmin }))
 }
 
 

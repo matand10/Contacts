@@ -12,7 +12,7 @@ const utilService = require('../services/util.service')
 router.post("/create", async (req, res) => {
 
   try {
-    const transactions = JSON.parse(req.body.data);
+    const transactions = req.body
 
     // Process the payment for each credit
     const payments = await Promise.all(
@@ -45,7 +45,7 @@ router.post("/create", async (req, res) => {
 
 router.post("/contact/purchase", async (req, res) => {
   try {
-    const { transaction, userId } = JSON.parse(req.body.data)
+    const { transaction, userId } = req.body
 
     const transactionAmountInCredits = utilService.getTransactionsContactValueInCredit(transaction)
 
@@ -92,7 +92,7 @@ module.exports = router;
 //     // Update the contact_transaction collection for each contact
 //     const contactTransactions = await contactTransactionService.add(contactsToSave)
 
-//     //  Update the user's credit transaction history 
+//     //  Update the user's credit transaction history
 //     const { updatedUser, status } = await userService.addContactTransaction(contactTransactions, user)
 //     if (status !== 'success') return res.status(401)
 //     res.status(200).json({ status: 'ok', content: updatedUser })

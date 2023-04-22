@@ -1,9 +1,9 @@
-const { CREDIT_VALIE } = require('../constants/credit')
+const { CREDIT_VALUE } = require('../constants/credit')
 
 module.exports = {
     getFirstLetterUppercase,
     getUsersOneWeekAgo,
-    getTransactionsContactValueInCredit
+    getTransactionsContactValueInCredit,
 }
 
 
@@ -21,10 +21,10 @@ function getUsersOneWeekAgo(users) {
 }
 
 function getTransactionsContactValueInCredit(contactTransactions) {
-    return contactTransactions.price / CREDIT_VALIE
+    return contactTransactions.price / CREDIT_VALUE
     // let amount = 0
     // contactTransactions.forEach(trans => {
-    //     amount += (trans.price / CREDIT_VALIE)
+    //     amount += (trans.price / CREDIT_VALUE)
     // })
     // return amount
 }

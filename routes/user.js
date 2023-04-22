@@ -36,11 +36,10 @@ router.put("/:id", verifyTokenAndAuthorization, async (req, res) => {
 });
 
 //DELETE
-router.post("/remove/:id", requireAdmin, async (req, res) => {
+router.post("/remove/:id", verifyTokenAndAdmin, async (req, res) => {
   try {
-    const { userId } = JSON.parse(req.body.data)
-    const collection = await dbService.getCollection('user')
-    await collection.deleteOne({ _id: ObjectId(userId) })
+    const { userId } = req.body
+    await userService.remove(userId)
     res.status(200).json({ status: 'ok', content: userId })
   } catch (err) {
     res.status(500).json(err);
@@ -50,7 +49,7 @@ router.post("/remove/:id", requireAdmin, async (req, res) => {
 //UPDATE
 router.post("/update", verifyTokenAndAdmin, async (req, res) => {
   try {
-    const { updatedUser } = JSON.parse(req.body.data)
+    const { updatedUser } = req.body
     const savedUser = await userService.update(updatedUser)
     res.status(200).json({ status: 'ok', content: savedUser })
   } catch (err) {
@@ -61,7 +60,7 @@ router.post("/update", verifyTokenAndAdmin, async (req, res) => {
 //GET USER
 router.post("/find/:id", async (req, res) => {
   try {
-    const { userId } = JSON.parse(req.body.data)
+    const { userId } = req.body
     const user = await userService.getById(userId)
     res.status(200).json({ status: 'ok', content: user });
   } catch (err) {
@@ -72,7 +71,7 @@ router.post("/find/:id", async (req, res) => {
 //GET ALL USER
 router.post("/", verifyTokenAndAdmin, async (req, res) => {
   try {
-    const { filterBy } = JSON.parse(req.body.data)
+    const filterBy = req.body
     const users = await userService.query(filterBy)
     res.status(200).json({ status: 'ok', content: users });
   } catch (err) {
@@ -81,12 +80,12 @@ router.post("/", verifyTokenAndAdmin, async (req, res) => {
 });
 
 // CREATE USER
-router.post("/create", verifyAdmin, async (req, res) => {
+router.post("/create", verifyTokenAndAdmin, async (req, res) => {
   try {
-    const { userCred } = JSON.parse(req.body.data)
+    const { userCred } = req.body
     const saltRounds = 10
     const hash = await bcrypt.hash(userCred.password, saltRounds)
-    const content = {
+    const userToCreate = {
       username: userCred.username,
       password: hash,
       fullname: userCred.fullname,
@@ -96,12 +95,10 @@ router.post("/create", verifyAdmin, async (req, res) => {
       active: userCred.active
     }
     if (!userCred.username || !userCred.password) return Promise.reject('fullname, username and password are required!')
-    const newUser = new User(content)
+    const newUser = new User(userToCreate)
+    const savedUser = await userService.add(newUser)
 
-    const collection = await dbService.getCollection('user')
-    const addedUser = await collection.insertOne(newUser)
-
-    res.status(200).json({ status: 'ok', content: newUser })
+    res.status(200).json({ status: 'ok', content: savedUser })
   } catch (err) {
     res.status(500).json({ status: 'error' })
   }

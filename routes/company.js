@@ -4,7 +4,7 @@ const companyService = require("../services/company.service")
 //CREATE
 router.post("/create", async (req, res) => {
     try {
-        const { company } = JSON.parse(req.body.data)
+        const { company } = req.body
         const savedCompany = await companyService.add(company)
         res.status(200).json({ status: 'ok', content: savedCompany });
     } catch (err) {
@@ -15,7 +15,7 @@ router.post("/create", async (req, res) => {
 // //UPDATE
 router.post("/update/:id", async (req, res) => {
     try {
-        const { company } = JSON.parse(req.body.data)
+        const { company } = req.body
         await companyService.update(company)
         res.status(200).json({ status: 'ok' });
     } catch (err) {
@@ -26,7 +26,7 @@ router.post("/update/:id", async (req, res) => {
 // //DELETE
 router.post("/:id", async (req, res) => {
     try {
-        const { id } = JSON.parse(req.body.data)
+        const { id } = req.body
         await companyService.remove(id)
         res.status(200).json({ status: 'ok' });
     } catch (err) {

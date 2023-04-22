@@ -1,6 +1,6 @@
 
-const CREDIT_VALIE = 20
+const CREDIT_VALUE = 20
 
 module.exports = {
-    CREDIT_VALIE
+    CREDIT_VALUE
 }

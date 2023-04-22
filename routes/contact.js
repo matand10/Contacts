@@ -1,21 +1,14 @@
-// const Product = require("../models/Product");
-const { requireAdmin } = require('../middlewares/requireAuth.middleware');
 const dbService = require('../services/db.service');
 const contactService = require('../services/contact.service')
 const { getFirstLetterUppercase } = require('../services/util.service');
-const {
-  verifyToken,
-  verifyTokenAndAuthorization,
-  verifyTokenAndAdmin,
-  verifyAdmin,
-} = require("./verifyToken");
+const { verifyTokenAndAdmin, } = require("./verifyToken");
 const ObjectId = require('mongodb').ObjectId
 const router = require("express").Router();
 
-//CREATE
-router.post("/create", requireAdmin, async (req, res) => {
+// ADD
+router.post("/create", verifyTokenAndAdmin, async (req, res) => {
   try {
-    const { contact } = JSON.parse(req.body.data)
+    const { contact } = req.body
     const savedContact = await contactService.add(contact)
     res.status(200).json({ status: 'ok', content: savedContact });
   } catch (err) {
@@ -23,15 +16,15 @@ router.post("/create", requireAdmin, async (req, res) => {
   }
 });
 
-// //UPDATE
-router.post("/update/:id", requireAdmin, async (req, res) => {
-  const { contact } = JSON.parse(req.body.data)
+// UPDATE
+router.post("/update/:id", verifyTokenAndAdmin, async (req, res) => {
+  const { contact } = req.body
   try {
-    var id = ObjectId(contact._id)
+    const id = ObjectId(contact._id)
     delete contact._id
     const collection = await dbService.getCollection('contact')
     await collection.updateOne({ _id: id }, { $set: { ...contact } })
-    const updatedContact = await collection.findOne({ _id: ObjectId(id) })
+    const updatedContact = await collection.findOne({ _id: id })
     res.status(200).json({ status: 'ok', content: updatedContact });
   } catch (err) {
     res.status(500).json(err);
@@ -39,9 +32,9 @@ router.post("/update/:id", requireAdmin, async (req, res) => {
 });
 
 // //DELETE
-router.post("/:id", requireAdmin, async (req, res) => {
+router.post("/:id", verifyTokenAndAdmin, async (req, res) => {
   try {
-    const { id } = JSON.parse(req.body.data)
+    const { id } = req.body
     const collection = await dbService.getCollection('contact')
     await collection.deleteOne({ _id: ObjectId(id) })
     res.status(200).json({ status: 'ok' });
