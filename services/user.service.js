@@ -96,19 +96,15 @@ async function add(user) {
     }
 }
 
-async function addCreditTransaction(transactions) {
+async function addCreditTransaction(transactions, userId) {
     try {
-        let savedUser
-        await Promise.all(
-            transactions.map(async transaction => {
-                const { userId } = transaction
-                const user = await getById(userId)
-                const updatedUser = _updatePurchase(user, transaction)
-                await update(updatedUser)
-                savedUser = { status: 'success', updatedUser }
-            })
-        )
-        return savedUser
+        let user = await getById(userId)
+        transactions.forEach(trans => {
+            user.credits += trans.creditQuantity
+            user.creditTransactions.unshift(trans)
+        })
+        await update(user)
+        return user
     } catch (err) {
         throw err
     }
@@ -143,16 +139,6 @@ async function removeContactTransaction(transaction, user) {
     } catch (err) {
         throw err
     }
-}
-
-function _updatePurchase(user, transaction) {
-    switch (transaction.type) {
-        case 'credit_purchase':
-            user.credits += transaction.creditQuantity
-            user.creditTransactions.unshift(transaction)
-            break
-    }
-    return user
 }
 
 function _buildCriteria(filterBy) {

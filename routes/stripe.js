@@ -13,6 +13,7 @@ router.post("/create", verifyToken, async (req, res) => {
 
   try {
     const transactions = req.body
+    const userId = req.user._id
 
     // Process the payment for each credit
     const payments = await Promise.all(
@@ -29,13 +30,14 @@ router.post("/create", verifyToken, async (req, res) => {
     // Modeling the transactions
     const creditsToSave = transactions.map(transaction => new CreditTransaction({ ...transaction }))
 
+
     // Update the credit_transaction collection for each credit
     const credits = await creditTransactionService.add(creditsToSave)
 
 
     //  Update the user's credit transaction history 
-    const { updatedUser, status } = await userService.addCreditTransaction(credits)
-    if (status !== 'success') return res.status(401)
+    const updatedUser = await userService.addCreditTransaction(credits, userId)
+    if (!updatedUser) return res.status(401)
     res.status(200).json({ status: 'ok', content: updatedUser })
   } catch (err) {
     res.status(500)
