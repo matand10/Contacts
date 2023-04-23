@@ -14,6 +14,17 @@ async function get() {
     }
 }
 
+async function getById(userId) {
+    try {
+        const collection = await dbService.getCollection(COLLECTION_KEY)
+        const user = await collection.findOne({ '_id': ObjectId(userId) })
+        delete user.password
+        return user
+    } catch (err) {
+        throw err
+    }
+}
+
 async function update(entity) {
     try {
         const updatedEntity = {
@@ -27,14 +38,11 @@ async function update(entity) {
     }
 }
 
-async function add(credit) {
+async function add(transaction) {
     try {
         collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.insertOne(credit)
-        // await Promise.all(
-        //     credits.map(credit => collection.insertOne(credit))
-        // )
-        return credit
+        await collection.insertOne(transaction)
+        return transaction
     } catch (err) {
         throw err
     }
@@ -55,4 +63,5 @@ module.exports = {
     update,
     add,
     remove,
+    getById,
 }

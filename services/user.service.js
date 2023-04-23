@@ -13,7 +13,8 @@ module.exports = {
     update,
     add,
     addCreditTransaction,
-    addContactTransaction
+    addContactTransaction,
+    removeContactTransaction,
 }
 
 async function query(filterBy = {}) {
@@ -41,6 +42,7 @@ async function getById(userId) {
         throw err
     }
 }
+
 async function getByUsername(username) {
     try {
         const collection = await dbService.getCollection(COLLECTION_KEY)
@@ -115,16 +117,28 @@ async function addCreditTransaction(transactions) {
 async function addContactTransaction(transaction, user) {
     try {
         let savedUser
-        const updatedUser = _updatePurchase(user, transaction)
+        const updatedUser = { ...user }
+        updatedUser.credits -= transaction.priceInCredit
+        updatedUser.contactTransactions.unshift(transaction)
         await update(updatedUser)
         savedUser = { status: 'success', updatedUser }
-        // await Promise.all(
-        //     transactions.map(async transaction => {
-        //         const updatedUser = _updatePurchase(user, transaction)
-        //         await update(updatedUser)
-        //         savedUser = { status: 'success', updatedUser }
-        //     })
-        // )
+        return savedUser
+    } catch (err) {
+        throw err
+    }
+}
+
+async function removeContactTransaction(transaction, user) {
+    try {
+        let savedUser
+        const updatedUser = { ...user }
+        updatedUser.credits += transaction.priceInCredit
+        const updatedTransactions = updatedUser.contactTransactions.filter(trans => {
+            return trans._id.toString() !== transaction._id.toString()
+        })
+        updatedUser.contactTransactions = updatedTransactions
+        await update(updatedUser)
+        savedUser = { status: 'success', updatedUser }
         return savedUser
     } catch (err) {
         throw err
@@ -136,10 +150,6 @@ function _updatePurchase(user, transaction) {
         case 'credit_purchase':
             user.credits += transaction.creditQuantity
             user.creditTransactions.unshift(transaction)
-            break
-        case 'contact_purchase':
-            user.credits -= transaction.contactPriceInCredit
-            user.contactTransactions.unshift(transaction)
             break
     }
     return user

@@ -5,11 +5,11 @@ const ContactTransaction = require('../models/ContactTransaction')
 const creditTransactionService = require('../services/CreditTransaction.service')
 const contactTransactionService = require('../services/contactTransaction.service')
 const paymentService = require("../services/payment.service")
-const userService = require('../services/user.service')
-const utilService = require('../services/util.service')
+const userService = require('../services/user.service');
+const { verifyToken } = require("./verifyToken");
 
 
-router.post("/create", async (req, res) => {
+router.post("/create", verifyToken, async (req, res) => {
 
   try {
     const transactions = req.body
@@ -43,19 +43,20 @@ router.post("/create", async (req, res) => {
 });
 
 
-router.post("/contact/purchase", async (req, res) => {
+router.post("/contact/purchase", verifyToken, async (req, res) => {
   try {
-    const { transaction, userId } = req.body
+    const { transaction, userId, type } = req.body
 
-    const transactionAmountInCredits = utilService.getTransactionsContactValueInCredit(transaction)
+    // const transactionAmountInCredits = utilService.getTransactionsContactValueInCredit(transaction)
 
     // Checks user credits status
     const user = await userService.getById(userId)
     if (!user) return res.status(401).json({ status: 'User not found' })
-    else if (user.credits < transactionAmountInCredits) return res.status(409).json({ status: 'error' })
+    else if (user.credits < transaction.priceInCredit) return res.status(409).json({ status: 'error' })
 
     // Modeling the transactions
-    const contactToSave = new ContactTransaction({ ...transaction })
+    const newTransaction = { ...transaction, type, userId }
+    const contactToSave = new ContactTransaction(newTransaction)
 
     // Update the contact_transaction collection for each contact
     const contactTransaction = await contactTransactionService.add(contactToSave)
@@ -70,34 +71,32 @@ router.post("/contact/purchase", async (req, res) => {
   }
 })
 
+router.post("/contact/remove", verifyToken, async (req, res) => {
+  try {
+    const { transactionId, userId, type } = req.body
+
+    // Checks if user exists
+    const user = await userService.getById(userId)
+    if (!user) return res.status(401).json({ status: 'Not Authorized' })
+
+    // Finding user transaction
+    const contactTransaction = user.contactTransactions.find(trans => {
+      return trans._id.toString() === transactionId
+    })
+
+    if (!contactTransaction) return res.status(404).json('You do not own this contact')
+
+    // Removing the contact purchase from the table
+    await contactTransactionService.remove(contactTransaction._id)
+
+    // Update the user's credit transaction history 
+    await userService.removeContactTransaction(contactTransaction, user)
+    res.status(200).json({ status: 'ok' })
+  } catch (err) {
+    res.status(500).json(err)
+    throw err
+  }
+})
+
+
 module.exports = router;
-
-
-// router.post("/contact/purchase", async (req, res) => {
-//   try {
-//     const { transaction, userId } = JSON.parse(req.body.data)
-
-//     console.log(transaction)
-
-//     const transactionAmountInCredits = utilService.getTransactionsContactValueInCredit(transaction)
-
-//     // Checks user credits status
-//     const user = await userService.getById(userId)
-//     if (!user) return res.status(401).json({ status: 'User not found' })
-//     else if (user.credits < transactionAmountInCredits) return res.status(409).json({ status: 'error' })
-
-//     // Modeling the transactions
-//     const contactsToSave = transactions.map(transaction => new ContactTransaction({ ...transaction }))
-
-//     // Update the contact_transaction collection for each contact
-//     const contactTransactions = await contactTransactionService.add(contactsToSave)
-
-//     //  Update the user's credit transaction history
-//     const { updatedUser, status } = await userService.addContactTransaction(contactTransactions, user)
-//     if (status !== 'success') return res.status(401)
-//     res.status(200).json({ status: 'ok', content: updatedUser })
-//   } catch (err) {
-//     res.status(500).json(err)
-//     throw err
-//   }
-// })

@@ -6,7 +6,6 @@ module.exports = {
     getTransactionsContactValueInCredit,
 }
 
-
 function getFirstLetterUppercase(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
@@ -22,9 +21,4 @@ function getUsersOneWeekAgo(users) {
 
 function getTransactionsContactValueInCredit(contactTransactions) {
     return contactTransactions.price / CREDIT_VALUE
-    // let amount = 0
-    // contactTransactions.forEach(trans => {
-    //     amount += (trans.price / CREDIT_VALUE)
-    // })
-    // return amount
 }
