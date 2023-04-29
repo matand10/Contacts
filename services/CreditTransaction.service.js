@@ -6,7 +6,7 @@ const purchaseStatus = require('../constants/PurchaseStatus')
 
 const COLLECTION_KEY = 'credit_transaction'
 
-async function get() {
+async function query() {
     try {
         const collection = await dbService.getCollection(COLLECTION_KEY)
         const entities = await collection.find({}).toArray()
@@ -52,7 +52,7 @@ async function remove(entityId) {
 
 
 module.exports = {
-    get,
+    query,
     update,
     add,
     remove,

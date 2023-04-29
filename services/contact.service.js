@@ -5,10 +5,6 @@ const Contact = require("../models/Contact");
 
 const COLLECTION_KEY = 'contact'
 
-module.exports = {
-    add,
-    update
-}
 
 async function add(contact) {
     try {
@@ -51,6 +47,39 @@ async function update(updatedContact) {
     }
 }
 
+async function query(filterBy = {}) {
+    const criteria = _buildCriteria(filterBy)
+    try {
+        const collection = await dbService.getCollection(COLLECTION_KEY)
+        const entities = await collection.find(criteria).toArray()
+        return entities
+    } catch (err) {
+        throw err
+    }
+}
+
+async function getById(entityId) {
+    try {
+        const collection = await dbService.getCollection(COLLECTION_KEY)
+        const entity = await collection.findOne({ '_id': ObjectId(entityId) })
+        return entity
+    } catch (err) {
+        throw err
+    }
+}
+
+function _buildCriteria(filterBy) {
+    const criteria = {}
+    if (filterBy.inStock) {
+        if (filterBy.inStock === 'inStock') criteria.inStock = true
+        else criteria.inStock = false
+    }
+    return criteria
+}
+
+
 module.exports = {
-    add
+    query,
+    getById,
+    add,
 }

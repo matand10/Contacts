@@ -4,7 +4,7 @@ const ObjectId = require('mongodb').ObjectId
 
 const COLLECTION_KEY = 'credit'
 
-async function get() {
+async function query() {
     try {
         const collection = await dbService.getCollection(COLLECTION_KEY)
         const entities = await collection.find({}).toArray()
@@ -53,7 +53,7 @@ async function remove(entityId) {
 
 
 module.exports = {
-    get,
+    query,
     update,
     add,
     remove,

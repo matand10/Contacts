@@ -15,7 +15,7 @@ const ContactSchema = new mongoose.Schema(
         mobile: { type: Array, required: false, default: [] },
         phone: { type: Array, required: false, default: [] },
         linkedinLinks: { type: Array, required: false, default: [] },
-        agents: { type: Array, required: false, default: [] },
+        agent: { type: Object, required: false, default: null },
         img: { type: Object, required: false, default: {} },
         createdAt: { type: Date, required: true, default: new Date() },
     },

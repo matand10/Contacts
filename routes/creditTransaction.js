@@ -1,14 +1,13 @@
 const router = require("express").Router();
 const creditTransactionService = require("../services/CreditTransaction.service");
-const { validateToken } = require("../routes/verifyToken");
+const { validateToken, verifyTokenAndAdmin } = require("../routes/verifyToken");
 
 //CREATE
 router.post("/create", validateToken, async (req, res) => {
     try {
-        const transaction = JSON.parse(req.body.data)
-        const savedTransaction = await creditTransactionService.add(transaction)
+        const transaction = req.body
+        await creditTransactionService.add(transaction)
         res.status(200).json({ status: 'ok' });
-        // res.status(200).json({ status: 'ok', content: savedTransaction });
     } catch (err) {
         res.status(500).json(err);
     }
@@ -37,9 +36,10 @@ router.post("/:id", async (req, res) => {
 });
 
 //GET ALL
-router.get("/", async (req, res) => {
+router.get("/", verifyTokenAndAdmin, async (req, res) => {
     try {
-        const transactions = await creditTransactionService.get()
+        const filterBy = req.query
+        const transactions = await creditTransactionService.query(filterBy)
         res.status(200).json({ status: 'ok', content: transactions })
     } catch (err) {
         res.status(500).json(err);

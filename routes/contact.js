@@ -43,7 +43,7 @@ router.post("/:id", verifyTokenAndAdmin, async (req, res) => {
   }
 });
 
-// //GET CONTACT
+// GET CONTACT
 router.get("/find/:id", async (req, res) => {
   const { id } = req.params
   try {
@@ -56,11 +56,11 @@ router.get("/find/:id", async (req, res) => {
 });
 
 //GET ALL CONTACTS
-router.get("/", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
-    const collection = await dbService.getCollection('contact')
-    const contacts = await collection.find({}).toArray()
-    res.status(200).json(contacts)
+    const filterBy = req.body
+    const contacts = await contactService.query(filterBy)
+    res.status(200).json({ status: 'ok', content: contacts })
   } catch (err) {
     res.status(500).json(err);
     throw err

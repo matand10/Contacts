@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const CreditTransactionSchema = new mongoose.Schema(
   {
-    userId: { type: String, required: true, default: null },
+    userInfo: { type: Object, required: true, default: null },
     type: { type: String, required: true, default: null },
     creditId: { type: String, required: true, default: null },
     creditName: { type: String, required: true, default: null },

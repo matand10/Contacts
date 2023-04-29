@@ -4,7 +4,7 @@ const creditService = require("../services/credit.service")
 //CREATE
 router.post("/create", async (req, res) => {
     try {
-        const { credit } = JSON.parse(req.body.data)
+        const credit = req.body
         const savedCredit = await creditService.add(credit)
         res.status(200).json({ status: 'ok', content: savedCredit });
     } catch (err) {
@@ -15,7 +15,7 @@ router.post("/create", async (req, res) => {
 // //UPDATE
 router.post("/update/:id", async (req, res) => {
     try {
-        const { credit } = JSON.parse(req.body.data)
+        const credit = req.body
         await creditService.update(credit)
         res.status(200).json({ status: 'ok' });
     } catch (err) {
@@ -26,7 +26,7 @@ router.post("/update/:id", async (req, res) => {
 // //DELETE
 router.post("/:id", async (req, res) => {
     try {
-        const { id } = JSON.parse(req.body.data)
+        const { id } = req.body
         await creditService.remove(id)
         res.status(200).json({ status: 'ok' });
     } catch (err) {
@@ -35,9 +35,9 @@ router.post("/:id", async (req, res) => {
 });
 
 //GET ALL
-router.get("/", async (req, res) => {
+router.post("/", async (req, res) => {
     try {
-        const credits = await creditService.get()
+        const credits = await creditService.query()
         res.status(200).json({ status: 'ok', content: credits })
     } catch (err) {
         res.status(500).json(err);
