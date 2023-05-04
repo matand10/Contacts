@@ -5,7 +5,6 @@ const Contact = require("../models/Contact");
 
 const COLLECTION_KEY = 'contact'
 
-
 async function add(contact) {
     try {
         const newContact = new Contact(contact)

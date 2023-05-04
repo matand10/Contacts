@@ -91,7 +91,9 @@ router.post("/create", verifyTokenAndAdmin, async (req, res) => {
       email: userCred.email,
       phone: userCred.phone,
       address: userCred.address,
-      active: userCred.active
+      active: userCred.active,
+      gender: userCred.gender,
+      permissions: userCred.permissions,
     }
     if (!userCred.username || !userCred.password) return Promise.reject('fullname, username and password are required!')
     const newUser = new User(userToCreate)

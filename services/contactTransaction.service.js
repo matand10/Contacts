@@ -1,13 +1,12 @@
 const dbService = require('./db.service')
-const userService = require('./user.service')
 const ObjectId = require('mongodb').ObjectId
 
 const COLLECTION_KEY = 'contact_transaction'
 
-async function get() {
+async function get(filterBy) {
     try {
         const collection = await dbService.getCollection(COLLECTION_KEY)
-        const entities = await collection.find({}).toArray()
+        const entities = await collection.find(filterBy).toArray()
         return entities
     } catch (err) {
         throw err

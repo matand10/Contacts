@@ -74,6 +74,7 @@ async function update(updatedUser) {
             phone: updatedUser.phone,
             address: updatedUser.address,
             favorites: updatedUser.favorites,
+            permissions: updatedUser.permissions,
             credits: updatedUser.credits,
             creditTransactions: updatedUser.creditTransactions,
             contactTransactions: updatedUser.contactTransactions,

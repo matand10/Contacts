@@ -21,5 +21,5 @@ const ContactSchema = new mongoose.Schema(
     },
 );
 
-const ChannelModel = mongoose.model("contacts", ContactSchema);
+const ChannelModel = mongoose.model("Contact", ContactSchema);
 module.exports = ChannelModel

@@ -23,6 +23,7 @@ const companyRoute = require("./routes/company")
 const territoryRoute = require("./routes/territory")
 const creditRoute = require("./routes/credit")
 const creditTransactionRoute = require("./routes/creditTransaction")
+const contactTransactionRoute = require("./routes/contactTransaction")
 const cors = require("cors");
 const path = require("path");
 
@@ -54,6 +55,7 @@ app.use("/api/company", companyRoute)
 app.use("/api/territory", territoryRoute)
 app.use("/api/credit", creditRoute)
 app.use("/api/credit/transaction", creditTransactionRoute)
+app.use("/api/contact/transaction", contactTransactionRoute)
 app.use(express.static('public'));
 
 app.get('*', (req, res) => {
