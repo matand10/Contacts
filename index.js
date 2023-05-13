@@ -1,6 +1,6 @@
 const express = require("express");
-// const http = require('http')
-const https = require('https')
+const http = require('http')
+// const https = require('https')
 const fs = require('fs')
 const app = express();
 const dotenv = require("dotenv");
@@ -24,6 +24,7 @@ const territoryRoute = require("./routes/territory")
 const creditRoute = require("./routes/credit")
 const creditTransactionRoute = require("./routes/creditTransaction")
 const contactTransactionRoute = require("./routes/contactTransaction")
+const contactRequestRoute = require("./routes/contactRequest")
 const cors = require("cors");
 const path = require("path");
 
@@ -56,6 +57,7 @@ app.use("/api/territory", territoryRoute)
 app.use("/api/credit", creditRoute)
 app.use("/api/credit/transaction", creditTransactionRoute)
 app.use("/api/contact/transaction", contactTransactionRoute)
+app.use("/api/contact/request", contactRequestRoute)
 app.use(express.static('public'));
 
 app.get('*', (req, res) => {
@@ -63,6 +65,6 @@ app.get('*', (req, res) => {
 });
 
 const port = process.env.PORT || 80
-// const sslServer = http.createServer(app)
-const sslServer = https.createServer(options, app)
+const sslServer = http.createServer(app)
+// const sslServer = https.createServer(options, app)
 sslServer.listen(port, () => console.log('Listening on port ' + port))

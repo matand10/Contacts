@@ -16,6 +16,15 @@ async function add(contact) {
     }
 }
 
+async function remove(entitiyId) {
+    try {
+        const collection = await dbService.getCollection(COLLECTION_KEY)
+        await collection.deleteOne({ '_id': ObjectId(entitiyId) })
+    } catch (err) {
+        throw err
+    }
+}
+
 async function update(updatedContact) {
     try {
         // peek only updatable fields!
@@ -34,9 +43,9 @@ async function update(updatedContact) {
             mobile: updatedContact.mobile,
             phone: updatedContact.phone,
             linkedinLinks: updatedContact.linkedinLinks,
-            agents: updatedContact.agents,
             img: updatedContact.img,
             createdAt: updatedContact.createdAt,
+            agent: updatedContact.agent
         }
         const collection = await dbService.getCollection(COLLECTION_KEY)
         await collection.updateOne({ '_id': contactToSave._id }, { $set: contactToSave })
@@ -69,8 +78,8 @@ async function getById(entityId) {
 
 function _buildCriteria(filterBy) {
     const criteria = {}
-    if (filterBy.inStock) {
-        if (filterBy.inStock === 'inStock') criteria.inStock = true
+    if (filterBy.hasOwnProperty('inStock')) {
+        if (filterBy.inStock) criteria.inStock = true
         else criteria.inStock = false
     }
     return criteria
@@ -80,5 +89,7 @@ function _buildCriteria(filterBy) {
 module.exports = {
     query,
     getById,
+    remove,
     add,
+    update,
 }
