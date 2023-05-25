@@ -150,5 +150,9 @@ function _buildCriteria(filterBy) {
             $lt: new Date(filterBy.createdAt.endOfWeek)
         }
     }
+
+    if (filterBy.transactionContactId) {
+        criteria['contactTransactions.contact._id'] = filterBy.transactionContactId;
+    }
     return criteria
 }

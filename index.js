@@ -1,5 +1,5 @@
 const express = require("express");
-// const http = require('http')
+const http = require('http')
 const https = require('https')
 const fs = require('fs')
 const app = express();
@@ -65,6 +65,12 @@ app.get('*', (req, res) => {
 });
 
 const port = process.env.PORT || 80
-// const sslServer = http.createServer(app)
-const sslServer = https.createServer(options, app)
+let sslServer
+if (process.env.NODE_ENV === 'production') {
+    // Code for production
+    sslServer = https.createServer(options, app)
+} else {
+    // Code for development
+    sslServer = http.createServer(app)
+}
 sslServer.listen(port, () => console.log('Listening on port ' + port))

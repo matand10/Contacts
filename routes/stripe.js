@@ -1,12 +1,13 @@
-const router = require("express").Router();
+const router = require("express").Router()
 const CreditTransaction = require('../models/CreditTransaction')
 const ContactTransaction = require('../models/ContactTransaction')
 
 const creditTransactionService = require('../services/CreditTransaction.service')
 const contactTransactionService = require('../services/contactTransaction.service')
 const paymentService = require("../services/payment.service")
-const userService = require('../services/user.service');
-const { verifyToken } = require("./verifyToken");
+const userService = require('../services/user.service')
+const contactService = require('../services/contact.service')
+const { verifyToken } = require("./verifyToken")
 
 
 router.post("/create", verifyToken, async (req, res) => {
@@ -49,8 +50,6 @@ router.post("/contact/purchase", verifyToken, async (req, res) => {
   try {
     const { transaction, userId, type } = req.body
 
-    // const transactionAmountInCredits = utilService.getTransactionsContactValueInCredit(transaction)
-
     // Checks user credits status
     const user = await userService.getById(userId)
     if (!user) return res.status(401).json({ status: 'User not found' })
@@ -58,15 +57,19 @@ router.post("/contact/purchase", verifyToken, async (req, res) => {
 
     // Modeling the transactions
     const newTransaction = { ...transaction, type, userId }
-    const contactToSave = new ContactTransaction(newTransaction)
+    const contactTransToSave = new ContactTransaction(newTransaction)
 
     // Update the contact_transaction collection for each contact
-    const contactTransaction = await contactTransactionService.add(contactToSave)
+    const contactTransaction = await contactTransactionService.add(contactTransToSave)
+
+    // Update the contact
+    await contactService.updateContactTransaction(contactTransToSave)
 
     //  Update the user's credit transaction history 
     const { updatedUser, status } = await userService.addContactTransaction(contactTransaction, user)
     if (status !== 'success') return res.status(401)
     res.status(200).json({ status: 'ok', content: updatedUser })
+    // res.status(200).json({ status: 'ok' })
   } catch (err) {
     res.status(500).json(err)
     throw err

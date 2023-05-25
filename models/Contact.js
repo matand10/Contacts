@@ -18,6 +18,7 @@ const ContactSchema = new mongoose.Schema(
         agent: { type: Object, required: false, default: null },
         img: { type: Object, required: false, default: {} },
         createdAt: { type: Date, required: true, default: new Date() },
+        transactionHistory: { type: Array, required: false, default: [] },
     },
 );
 

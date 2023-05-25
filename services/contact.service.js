@@ -42,7 +42,7 @@ async function update(updatedContact) {
             email: updatedContact.email,
             mobile: updatedContact.mobile,
             phone: updatedContact.phone,
-            linkedinLinks: updatedContact.linkedinLinks,
+            linkedinLink: updatedContact.linkedinLink,
             img: updatedContact.img,
             createdAt: updatedContact.createdAt,
             agent: updatedContact.agent
@@ -76,6 +76,28 @@ async function getById(entityId) {
     }
 }
 
+async function updateContactTransaction(contactTransaction) {
+    try {
+        const { contact } = contactTransaction
+        const transToSave = {
+            transactionId: contactTransaction._id,
+            createdAt: contactTransaction.createdAt,
+            priceInCredit: contactTransaction.priceInCredit,
+            userId: contactTransaction.userId,
+            type: contactTransaction.type,
+        }
+
+        contact.transactionHistory.push(transToSave);
+        const collection = await dbService.getCollection(COLLECTION_KEY);
+        await collection.updateOne(
+            { _id: ObjectId(contact._id) },
+            { $set: { transactionHistory: contact.transactionHistory } }
+        )
+    } catch (err) {
+        throw err
+    }
+}
+
 function _buildCriteria(filterBy) {
     const criteria = {}
     if (filterBy.hasOwnProperty('inStock')) {
@@ -92,4 +114,5 @@ module.exports = {
     remove,
     add,
     update,
+    updateContactTransaction,
 }
