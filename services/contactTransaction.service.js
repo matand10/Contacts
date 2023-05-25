@@ -1,4 +1,5 @@
 const dbService = require('./db.service')
+const userService = require('./user.service')
 const ObjectId = require('mongodb').ObjectId
 
 const COLLECTION_KEY = 'contact_transaction'
@@ -56,6 +57,19 @@ async function remove(entityId) {
     }
 }
 
+async function getUsersTransactionByContactId(contactTransId) {
+    try {
+        const users = await Promise.all(
+            contactTransId.map(userId => userService.getById(userId))
+        )
+        return users
+    } catch (err) {
+        throw err
+    }
+}
+
+
+
 
 module.exports = {
     get,
@@ -63,4 +77,5 @@ module.exports = {
     add,
     remove,
     getById,
+    getUsersTransactionByContactId,
 }
