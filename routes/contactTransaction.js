@@ -5,7 +5,6 @@ const { validateToken, verifyTokenAndAdmin } = require("../routes/verifyToken");
 router.post("/users", verifyTokenAndAdmin, async (req, res) => {
     try {
         const { contactIds } = req.body
-        console.log('contactIds', contactIds)
         const users = await contactTransactionService.getUsersTransactionByContactId(contactIds)
         res.status(200).json({ status: 'ok', content: users })
     } catch (err) {
