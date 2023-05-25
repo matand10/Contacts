@@ -2,7 +2,7 @@ const router = require("express").Router();
 const contactTransactionService = require("../services/contactTransaction.service");
 const { validateToken, verifyTokenAndAdmin } = require("../routes/verifyToken");
 
-router.post("/users", verifyTokenAndAdmin, async (req, res) => {
+router.post("/users", validateToken, async (req, res) => {
     try {
         const { contactIds } = req.body
         const users = await contactTransactionService.getUsersTransactionByContactId(contactIds)
