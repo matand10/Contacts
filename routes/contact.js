@@ -1,12 +1,12 @@
 const dbService = require('../services/db.service');
 const contactService = require('../services/contact.service')
 const { getFirstLetterUppercase } = require('../services/util.service');
-const { verifyTokenAndAdmin, } = require("./verifyToken");
+const { verifyTokenAndAdmin, validateToken } = require("./verifyToken");
 const ObjectId = require('mongodb').ObjectId
 const router = require("express").Router();
 
 // GET USER CONTACTS 
-router.post("/user", async (req, res) => {
+router.post("/user", validateToken, async (req, res) => {
   try {
     const { userId } = req.body
     const contacts = await contactService.getContactsByUserId(userId)
