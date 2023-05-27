@@ -65,12 +65,12 @@ app.get('*', (req, res) => {
 });
 
 const port = process.env.PORT || 80
-// let sslServer = https.createServer(options, app)
+let sslServer = https.createServer(options, app)
 // if (process.env.NODE_ENV === 'production') {
 //     // Code for production
 //     sslServer = https.createServer(options, app)
 // } else {
 //     // Code for development
-sslServer = http.createServer(app)
+// sslServer = http.createServer(app)
 // }
 sslServer.listen(port, () => console.log('Listening on port ' + port))
