@@ -1,7 +1,9 @@
 
-const dbService = require('./db.service')
-const contactService = require('./contact.service')
 const ObjectId = require('mongodb').ObjectId
+const requestStatus = require('../constants/requestStatus')
+const dbService = require('./db.service')
+const userService = require('./user.service')
+const contactService = require('./contact.service')
 const ContactRequest = require("../models/ContactRequest");
 
 const COLLECTION_KEY = 'contact_request'
@@ -58,10 +60,21 @@ async function update(entity) {
 async function approveContact(entity) {
     try {
         if (!entity.isApproved) {
+            // Updating request to approved
             entity.contact.inStock = true
+            entity.status = requestStatus.APPROVED
+
+            // Updating contact inStock
             await contactService.update(entity.contact)
+
+            // Inserting contact to user array contact belongs
+            const user = await userService.getById(entity?.contact?.agent?._id)
+            if (user) {
+                user.contactUploads.unshift(entity)
+                await userService.update(user)
+            }
+            return await update(entity)
         }
-        return await update(entity)
     } catch (err) {
         throw err
     }

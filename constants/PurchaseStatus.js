@@ -1,9 +1,9 @@
 
 
-const purchaseStatus = {
-    success: 'success',
-}
+const success = 'success'
+const failed = 'failed'
 
 module.exports = {
-    purchaseStatus
+    success,
+    failed
 }

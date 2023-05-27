@@ -2,6 +2,9 @@
 const dbService = require('./db.service')
 const ObjectId = require('mongodb').ObjectId
 const purchaseStatus = require('../constants/PurchaseStatus')
+const contactTransType = require('../constants/contactTransType')
+const ContactTransaction = require('../models/ContactTransaction')
+const ContactSale = require('../models/ContactSale')
 
 const COLLECTION_KEY = 'user'
 
@@ -15,6 +18,7 @@ module.exports = {
     addCreditTransaction,
     addContactTransaction,
     removeContactTransaction,
+    addContactTransactionSale,
 }
 
 async function query(filterBy = {}) {
@@ -78,6 +82,8 @@ async function update(updatedUser) {
             credits: updatedUser.credits,
             creditTransactions: updatedUser.creditTransactions,
             contactTransactions: updatedUser.contactTransactions,
+            contactUploads: updatedUser.contactUploads,
+            searchHistory: updatedUser.searchHistory,
         }
         const collection = await dbService.getCollection(COLLECTION_KEY)
         await collection.updateOne({ '_id': userToSave._id }, { $set: userToSave })
@@ -88,6 +94,16 @@ async function update(updatedUser) {
 }
 
 async function add(user) {
+    try {
+        const collection = await dbService.getCollection(COLLECTION_KEY)
+        await collection.insertOne(user)
+        return user
+    } catch (err) {
+        throw err
+    }
+}
+
+async function addApprovedContact(user) {
     try {
         const collection = await dbService.getCollection(COLLECTION_KEY)
         await collection.insertOne(user)
@@ -118,8 +134,32 @@ async function addContactTransaction(transaction, user) {
         updatedUser.credits -= transaction.priceInCredit
         updatedUser.contactTransactions.unshift(transaction)
         await update(updatedUser)
-        savedUser = { status: 'success', updatedUser }
+        savedUser = { status: purchaseStatus.success, updatedUser }
         return savedUser
+    } catch (err) {
+        throw err
+    }
+}
+
+async function addContactTransactionSale(transaction, user) {
+    try {
+        const updatedUser = { ...user }
+        const updatedSale = {
+            type: contactTransType.contactSale,
+            contact: transaction.contact,
+            priceInCredit: transaction.priceInCredit,
+            createdAt: transaction.createdAt,
+            sellerUserId: user._id,
+            buyingUserId: transaction.userId
+        }
+
+        const saleTransaction = new ContactSale(updatedSale)
+        if (transaction.contact.agent._id === user._id.toString()) {
+            updatedUser.credits += (saleTransaction.priceInCredit / 2)
+            updatedUser.contactTransactions.unshift(saleTransaction)
+            await update(updatedUser)
+            return { status: purchaseStatus.success, saleTransaction: saleTransaction }
+        } else return { status: purchaseStatus.failed }
     } catch (err) {
         throw err
     }
@@ -135,7 +175,7 @@ async function removeContactTransaction(transaction, user) {
         })
         updatedUser.contactTransactions = updatedTransactions
         await update(updatedUser)
-        savedUser = { status: 'success', updatedUser }
+        savedUser = { status: purchaseStatus.success, updatedUser }
         return savedUser
     } catch (err) {
         throw err

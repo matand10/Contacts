@@ -10,7 +10,7 @@ const { verifyTokenAndAdmin } = require("./verifyToken");
 //REGISTER
 router.post("/register", async (req, res) => {
   try {
-    const user = JSON.parse(req.body.data)
+    const user = req.body
     const saltRounds = 10
     const hash = await bcrypt.hash(user.password, saltRounds)
     const content = {

@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const contactRequestService = require("../services/contactRequest")
 const contactService = require("../services/contact.service")
-const { validateToken } = require("../routes/verifyToken");
+const { validateToken, verifyTokenAndAdmin } = require("../routes/verifyToken");
 
 //CREATE
 router.post("/create", validateToken, async (req, res) => {
@@ -26,7 +26,7 @@ router.post("/remove/:id", validateToken, async (req, res) => {
 });
 
 //UPDATE
-router.post("/update", validateToken, async (req, res) => {
+router.post("/update", verifyTokenAndAdmin, async (req, res) => {
     try {
         const contactRequest = req.body
         const savedContactRequest = await contactRequestService.approveContact(contactRequest)

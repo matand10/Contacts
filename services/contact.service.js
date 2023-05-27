@@ -45,7 +45,8 @@ async function update(updatedContact) {
             linkedinLink: updatedContact.linkedinLink,
             img: updatedContact.img,
             createdAt: updatedContact.createdAt,
-            agent: updatedContact.agent
+            agent: updatedContact.agent,
+            transactionHistory: updatedContact.transactionHistory
         }
         const collection = await dbService.getCollection(COLLECTION_KEY)
         await collection.updateOne({ '_id': contactToSave._id }, { $set: contactToSave })
@@ -79,6 +80,8 @@ async function getById(entityId) {
 async function updateContactTransaction(contactTransaction) {
     try {
         const { contact } = contactTransaction
+        const savedContact = await getById(contact._id)
+
         const transToSave = {
             transactionId: contactTransaction._id,
             createdAt: contactTransaction.createdAt,
@@ -87,12 +90,17 @@ async function updateContactTransaction(contactTransaction) {
             type: contactTransaction.type,
         }
 
-        contact.transactionHistory.push(transToSave);
-        const collection = await dbService.getCollection(COLLECTION_KEY);
-        await collection.updateOne(
-            { _id: ObjectId(contact._id) },
-            { $set: { transactionHistory: contact.transactionHistory } }
-        )
+        savedContact.transactionHistory.push(transToSave);
+        await update(savedContact)
+    } catch (err) {
+        throw err
+    }
+}
+
+async function getContactsByUserId(userId) {
+    try {
+        const contacts = await query({ userId })
+        return contacts
     } catch (err) {
         throw err
     }
@@ -100,10 +108,16 @@ async function updateContactTransaction(contactTransaction) {
 
 function _buildCriteria(filterBy) {
     const criteria = {}
+
     if (filterBy.hasOwnProperty('inStock')) {
         if (filterBy.inStock) criteria.inStock = true
         else criteria.inStock = false
     }
+
+    if (filterBy.userId) {
+        criteria['agent._id'] = filterBy.userId;
+    }
+
     return criteria
 }
 
@@ -115,4 +129,5 @@ module.exports = {
     add,
     update,
     updateContactTransaction,
+    getContactsByUserId,
 }

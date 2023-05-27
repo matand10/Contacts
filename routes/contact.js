@@ -5,6 +5,18 @@ const { verifyTokenAndAdmin, } = require("./verifyToken");
 const ObjectId = require('mongodb').ObjectId
 const router = require("express").Router();
 
+// GET USER CONTACTS 
+router.post("/user", async (req, res) => {
+  try {
+    const { userId } = req.body
+    const contacts = await contactService.getContactsByUserId(userId)
+    res.status(200).json({ status: 'ok', content: contacts })
+  } catch (err) {
+    res.status(500).json(err);
+    throw err
+  }
+});
+
 // ADD
 router.post("/create", verifyTokenAndAdmin, async (req, res) => {
   try {
