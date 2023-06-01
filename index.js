@@ -66,7 +66,7 @@ app.get('*', (req, res) => {
 
 const port = process.env.PORT || 80
 let sslServer = https.createServer(options, app)
-// sslServer = http.createServer(app)
+// let sslServer = http.createServer(app)
 // if (process.env.NODE_ENV === 'production') {
 //     // Code for production
 //     sslServer = https.createServer(options, app)
