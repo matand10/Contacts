@@ -62,7 +62,7 @@ router.post("/contact/purchase", verifyToken, async (req, res) => {
 
     // Updating user agent in credit and the relevant transaction
     if (transaction?.contact) {
-      const agentUser = await userService.getById(transaction.contact.agent._id)
+      const agentUser = await userService.getById(transaction?.contact?.agent?._id)
       if (agentUser) {
         const { saleTransaction, status } = await userService.addContactTransactionSale(contactTransToSave, agentUser)
         if (status === purchaseStatus.success) await contactSaleService.add(saleTransaction)

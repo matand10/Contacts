@@ -39,7 +39,7 @@ async function update(updatedContact) {
             inStock: updatedContact.inStock,
             name: updatedContact.name,
             familyName: updatedContact.familyName,
-            email: updatedContact.email,
+            emails: updatedContact.emails,
             mobile: updatedContact.mobile,
             phone: updatedContact.phone,
             linkedinLink: updatedContact.linkedinLink,
