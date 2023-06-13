@@ -3,8 +3,10 @@ const dbService = require('./db.service')
 const ObjectId = require('mongodb').ObjectId
 const purchaseStatus = require('../constants/PurchaseStatus')
 const contactTransType = require('../constants/contactTransType')
+
 const ContactTransaction = require('../models/ContactTransaction')
 const ContactSale = require('../models/ContactSale')
+const Notification = require('../models/Notification')
 
 const COLLECTION_KEY = 'user'
 
@@ -19,6 +21,7 @@ module.exports = {
     addContactTransaction,
     removeContactTransaction,
     addContactTransactionSale,
+    addNotification,
 }
 
 async function query(filterBy = {}) {
@@ -85,6 +88,7 @@ async function update(updatedUser) {
             contactTransactions: updatedUser.contactTransactions,
             contactUploads: updatedUser.contactUploads,
             searchHistory: updatedUser.searchHistory,
+            notifications: updatedUser.notifications,
         }
         const collection = await dbService.getCollection(COLLECTION_KEY)
         await collection.updateOne({ '_id': userToSave._id }, { $set: userToSave })
@@ -183,6 +187,19 @@ async function removeContactTransaction(transaction, user) {
     }
 }
 
+async function addNotification(user, type) {
+    try {
+        const updatedUser = { ...user }
+        const message = _notificationType(type)
+        const newNotification = new Notification({ message, type })
+        updatedUser.notifications.unshift(newNotification)
+        await update(updatedUser)
+        return newNotification
+    } catch (err) {
+        throw err
+    }
+}
+
 function _buildCriteria(filterBy) {
     const criteria = {}
     if (filterBy.createdAt) {
@@ -196,4 +213,15 @@ function _buildCriteria(filterBy) {
         criteria['contactTransactions.contact._id'] = filterBy.transactionContactId;
     }
     return criteria
+}
+
+function _notificationType(type) {
+    switch (type) {
+        case contactTransType.contactSale:
+            return 'You have just made a sale!'
+        case contactTransType.contactPurchase:
+            return 'Someone has just made a purchase from you!'
+        default:
+            break;
+    }
 }

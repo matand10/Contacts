@@ -25,9 +25,10 @@ const creditRoute = require("./routes/credit")
 const creditTransactionRoute = require("./routes/creditTransaction")
 const contactTransactionRoute = require("./routes/contactTransaction")
 const contactRequestRoute = require("./routes/contactRequest")
+
 const cors = require("cors");
 const path = require("path");
-
+const socketService = require("./services/socket.service")
 
 
 const corsOptions = {
@@ -65,12 +66,7 @@ app.get('*', (req, res) => {
 });
 
 const port = process.env.PORT || 80
-let sslServer = https.createServer(options, app)
-// let sslServer = http.createServer(app)
-// if (process.env.NODE_ENV === 'production') {
-//     // Code for production
-//     sslServer = https.createServer(options, app)
-// } else {
-//     // Code for development
-// }
+// let sslServer = https.createServer(options, app)
+let sslServer = http.createServer(app)
+socketService.socketConnect(sslServer)
 sslServer.listen(port, () => console.log('Listening on port ' + port))

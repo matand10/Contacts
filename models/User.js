@@ -21,6 +21,7 @@ const UserSchema = new mongoose.Schema(
     contactTransactions: { type: Array, required: true, default: [] },
     contactUploads: { type: Array, required: true, default: [] },
     searchHistory: { type: Array, required: true, default: [] },
+    notifications: { type: Array, required: true, default: [] },
   },
 );
 

@@ -9,6 +9,7 @@ const contactSaleService = require('../services/contactSale.service')
 const paymentService = require("../services/payment.service")
 const userService = require('../services/user.service')
 const contactService = require('../services/contact.service')
+const socketService = require('../services/socket.service')
 const { verifyToken } = require("./verifyToken")
 
 
@@ -62,10 +63,17 @@ router.post("/contact/purchase", verifyToken, async (req, res) => {
 
     // Updating user agent in credit and the relevant transaction
     if (transaction?.contact) {
-      const agentUser = await userService.getById(transaction?.contact?.agent?._id)
+      const agentId = transaction?.contact?.agent?._id
+      const agentUser = await userService.getById(agentId)
+
+
       if (agentUser) {
         const { saleTransaction, status } = await userService.addContactTransactionSale(contactTransToSave, agentUser)
-        if (status === purchaseStatus.success) await contactSaleService.add(saleTransaction)
+        if (status === purchaseStatus.success) {
+          await contactSaleService.add(saleTransaction)
+          const newNotification = await userService.addNotification(agentUser, type)
+          socketService.emitToUser({ type: 'set-user-contact', data: newNotification, userId: agentId })
+        }
       }
     }
 
