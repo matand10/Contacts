@@ -5,30 +5,31 @@ const fs = require('fs')
 const app = express();
 const dotenv = require("dotenv");
 const cookieParser = require('cookie-parser');
+const socketService = require("./services/socket.service")
 app.use(cookieParser());
 
 
 dotenv.config();
-const userRoute = require("./routes/user");
-const authRoute = require("./routes/auth");
-const contactRoute = require("./routes/contact");
-const cartRoute = require("./routes/cart");
-const orderRoute = require("./routes/order");
-const stripeRoute = require("./routes/stripe");
-const productRoute = require("./routes/product");
-const uploadRoute = require('./routes/uploadFile')
-const categoryRoute = require("./routes/category")
-const jobTitleRoute = require("./routes/jobTitle")
-const companyRoute = require("./routes/company")
-const territoryRoute = require("./routes/territory")
-const creditRoute = require("./routes/credit")
-const creditTransactionRoute = require("./routes/creditTransaction")
-const contactTransactionRoute = require("./routes/contactTransaction")
-const contactRequestRoute = require("./routes/contactRequest")
+const authRoute = require("./api/auth/auth.routes");
+const userRoute = require("./api/user/user.routes");
+const contactRoute = require("./api/contact/contact.routes");
+const uploadRoute = require('./api/upload/upload.routes')
+const categoryRoute = require("./api/category/category.routes")
+const jobTitleRoute = require("./api/jobTitle/jobTitle.routes")
+const companyRoute = require("./api/company/company.routes")
+const territoryRoute = require("./api/territory/territory.routes")
+const stripeRoute = require("./api/payment/payment.routes");
+const creditTransactionRoute = require("./api/creditTransaction/creditTransaction.routes")
+const contactTransactionRoute = require("./api/contactTransaction/contactTransaction.routes")
+const creditRoute = require("./api/credit/credit.routes")
+const contactRequestRoute = require("./api/contactRequest/contactRequest.routes")
+// Not Formatted
+// const cartRoute = require("./routes/cart");
+// const productRoute = require("./routes/product");
+// const orderRoute = require("./routes/order");
 
 const cors = require("cors");
 const path = require("path");
-const socketService = require("./services/socket.service")
 
 
 const corsOptions = {
@@ -42,14 +43,11 @@ const options = {
     cert: fs.readFileSync(path.join(__dirname, 'certificates', 'cert.pem'))
 }
 
+// Done
 app.use(express.json());
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/contacts", contactRoute);
-app.use("/api/product", productRoute);
-app.use("/api/carts", cartRoute);
-app.use("/api/orders", orderRoute);
-app.use("/api/payment", stripeRoute);
 app.use('/api/file', uploadRoute)
 app.use("/api/categories", categoryRoute);
 app.use("/api/jobTitle", jobTitleRoute)
@@ -59,6 +57,11 @@ app.use("/api/credit", creditRoute)
 app.use("/api/credit/transaction", creditTransactionRoute)
 app.use("/api/contact/transaction", contactTransactionRoute)
 app.use("/api/contact/request", contactRequestRoute)
+app.use("/api/payment", stripeRoute);
+// Not Formatted
+// app.use("/api/product", productRoute);
+// app.use("/api/carts", cartRoute);
+// app.use("/api/orders", orderRoute);
 app.use(express.static('public'));
 
 app.get('*', (req, res) => {
@@ -66,7 +69,7 @@ app.get('*', (req, res) => {
 });
 
 const port = process.env.PORT || 80
-let sslServer = https.createServer(options, app)
-// let sslServer = http.createServer(app)
+// let sslServer = https.createServer(options, app)
+let sslServer = http.createServer(app)
 socketService.socketConnect(sslServer)
 sslServer.listen(port, () => console.log('Listening on port ' + port))
