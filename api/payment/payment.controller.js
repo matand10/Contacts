@@ -3,6 +3,9 @@ const contactTransactionService = require("../contactTransaction/contactTransact
 const contactSaleService = require("../../services/contactSale.service")
 const contactService = require("../contact/contact.service")
 const socketService = require("../../services/socket.service")
+const ContactTransaction = require("../contactTransaction/contactTransaction.model")
+const purchaseStatus = require('../../constants/PurchaseStatus')
+const creditTransactionService = require("../credit/credit.service")
 
 
 //CREATE
@@ -42,6 +45,7 @@ async function createCreditPayment(req, res) {
 
 async function createContactPurchase(req, res) {
     try {
+        console.log('Hellooo')
         const { transaction, userId, type } = req.body
 
         // Checks user credits status
@@ -60,10 +64,10 @@ async function createContactPurchase(req, res) {
 
 
             if (agentUser) {
-                const { saleTransaction, status } = await userService.addContactTransactionSale(contactTransToSave, agentUser)
+                const { saleTransaction, status, updatedUser } = await userService.addContactTransactionSale(contactTransToSave, agentUser)
                 if (status === purchaseStatus.success) {
                     await contactSaleService.add(saleTransaction)
-                    const newNotification = await userService.addNotification(agentUser, type)
+                    const newNotification = await userService.addNotification(updatedUser, type)
                     socketService.emitToUser({ type: 'set-user-contact', data: newNotification, userId: agentId })
                 }
             }

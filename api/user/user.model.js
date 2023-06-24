@@ -22,6 +22,7 @@ const UserSchema = new mongoose.Schema(
         contactUploads: { type: Array, required: true, default: [] },
         searchHistory: { type: Array, required: true, default: [] },
         notifications: { type: Array, required: true, default: [] },
+        income: { type: Number, required: true, default: 0 },
     },
 );
 

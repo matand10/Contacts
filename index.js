@@ -33,7 +33,18 @@ const path = require("path");
 
 
 const corsOptions = {
-    origin: ['http://127.0.0.1:8080', 'http://localhost:8080', 'http://127.0.0.1:3000', 'http://localhost:3000', 'https://164.92.245.54:80', 'https://qleads.info:80', 'https://qleads.info', 'http://qleads.info', 'http://qleads.info:80'],
+    origin: [
+        'http://127.0.0.1:8080',
+        'http://localhost:8080',
+        'http://127.0.0.1:3000',
+        'http://localhost:3000',
+        'https://164.92.245.54:80',
+        'https://qleads.info:80',
+        'https://qleads.info',
+        'http://qleads.info',
+        'http://qleads.info:80',
+        'https://qleads-web-x8xrg.ondigitalocean.app',
+    ],
     credentials: true
 }
 app.use(cors(corsOptions))
@@ -62,11 +73,11 @@ app.use("/api/payment", stripeRoute);
 // app.use("/api/product", productRoute);
 // app.use("/api/carts", cartRoute);
 // app.use("/api/orders", orderRoute);
-app.use(express.static('public'));
+// app.use(express.static('public'));
 
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/index.html'));
-});
+// app.get('*', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public/index.html'));
+// });
 
 const port = process.env.PORT || 80
 // let sslServer = https.createServer(options, app)

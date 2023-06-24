@@ -12,6 +12,7 @@ const contactTransType = require('../../constants/contactTransType')
 const ContactSale = require('../../models/ContactSale')
 const Notification = require('../../models/Notification')
 const User = require('./user.model')
+const { CREDIT_VALUE } = require('../../constants/credit')
 
 async function query(filterBy = {}) {
     const criteria = _buildCriteria(filterBy)
@@ -78,6 +79,7 @@ async function update(updatedUser) {
             contactUploads: updatedUser.contactUploads,
             searchHistory: updatedUser.searchHistory,
             notifications: updatedUser.notifications,
+            income: updatedUser.income
         }
         const collection = await dbService.getCollection(COLLECTION_KEY)
         await collection.updateOne({ '_id': userToSave._id }, { $set: userToSave })
@@ -123,16 +125,6 @@ async function create(user) {
     }
 }
 
-async function addApprovedContact(user) {
-    try {
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.insertOne(user)
-        return user
-    } catch (err) {
-        throw err
-    }
-}
-
 async function addCreditTransaction(transactions, userId) {
     try {
         let user = await getById(userId)
@@ -163,7 +155,7 @@ async function addContactTransaction(transaction, user) {
 
 async function addContactTransactionSale(transaction, user) {
     try {
-        const updatedUser = { ...user }
+        const userToUpdate = { ...user }
         const updatedSale = {
             type: contactTransType.contactSale,
             contact: transaction.contact,
@@ -175,10 +167,10 @@ async function addContactTransactionSale(transaction, user) {
 
         const saleTransaction = new ContactSale(updatedSale)
         if (transaction.contact.agent._id === user._id.toString()) {
-            updatedUser.credits += (saleTransaction.priceInCredit / 2)
-            updatedUser.contactTransactions.unshift(saleTransaction)
-            await update(updatedUser)
-            return { status: purchaseStatus.success, saleTransaction: saleTransaction }
+            userToUpdate.income += (CREDIT_VALUE / 2)
+            userToUpdate.contactTransactions.unshift(saleTransaction)
+            const updatedUser = await update(userToUpdate)
+            return { status: purchaseStatus.success, saleTransaction: saleTransaction, updatedUser }
         } else return { status: purchaseStatus.failed }
     } catch (err) {
         throw err
