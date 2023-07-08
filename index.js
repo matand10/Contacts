@@ -80,7 +80,7 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
-const port = process.env.PORT || 80
+const port = process.env.PORT || 3030
 let sslServer = https.createServer(options, app)
 // let sslServer = http.createServer(app)
 socketService.socketConnect(sslServer)
