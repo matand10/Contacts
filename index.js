@@ -44,7 +44,7 @@ const corsOptions = {
         'https://qleads-web-x8xrg.ondigitalocean.app',
         'https://qleads-mobile-bljak.ondigitalocean.app',
         'https://qleads.mobi',
-        'https://qleads.mobi:80,'
+        'https://qleads.mobi:80'
     ],
     credentials: true
 }
@@ -80,7 +80,7 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
-const port = process.env.PORT || 3030
+const port = process.env.PORT || 80
 let sslServer = https.createServer(options, app)
 // let sslServer = http.createServer(app)
 socketService.socketConnect(sslServer)
