@@ -50,10 +50,20 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 
-const options = {
-    key: fs.readFileSync(path.join(__dirname, 'certificates', 'key.pem')),
-    cert: fs.readFileSync(path.join(__dirname, 'certificates', 'cert.pem'))
-}
+// Certificate
+// const privateKey = fs.readFileSync('/etc/letsencrypt/live/qleads.mobi/privkey.pem', 'utf8');
+// const certificate = fs.readFileSync('/etc/letsencrypt/live/qleads.mobi/cert.pem', 'utf8');
+// const ca = fs.readFileSync('/etc/letsencrypt/live/qleads.mobi/chain.pem', 'utf8');
+
+// const credentials = {
+//     key: privateKey,
+//     cert: certificate,
+// };
+
+// const options = {
+//     key: fs.readFileSync(path.join(__dirname, 'cert', 'privkey.pem')),
+//     cert: fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem'))
+// }
 
 // Done
 app.use(express.json());
