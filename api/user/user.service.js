@@ -136,14 +136,14 @@ async function create(user) {
 
         const newUser = new User(content)
         const savedUser = await newUser.save()
-        // const hashToken = await bcrypt.hash(utilService.generateRandomNumber(10), saltRounds)
+
         try {
             const token = await new Token({
                 userId: savedUser._id,
                 token: utilService.generateRandomNumber(10)
             })
             const savedToken = await token.save()
-            const url = `${config.baseUrl}users/${savedUser._id}/verify/${savedToken.token}`
+            const url = `https://qleads.mobi/api/users/${savedUser._id}/verify/${savedToken.token}`
             await emailService(savedUser.email, "Verify Email", url)
         } catch (err) {
             throw new Error('Cannot send verification link')
@@ -266,7 +266,7 @@ async function sendEmailVerification(user) {
             userToken = await token.save()
         }
 
-        const url = `${config.baseUrl}users/${user._id}/verify/${userToken.token}`
+        const url = `https://qleads.mobi/api/users/${user._id}/verify/${userToken.token}`
         await emailService(user.email, "Verify Email", url)
     } catch (error) {
         throw error
