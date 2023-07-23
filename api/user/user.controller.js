@@ -1,5 +1,8 @@
 const userService = require('./user.service')
 const dbService = require('../../services/db.service')
+const User = require('./user.model')
+const Token = require('../../models/Token')
+const { ObjectId } = require('mongodb')
 
 //DELETE
 async function removeUser(req, res) {
@@ -56,6 +59,17 @@ async function createUser(req, res) {
     }
 }
 
+// CHANGE USER PASSWORD
+async function changeUserPassByEmail(req, res) {
+    try {
+        const { email, password } = req.body
+        const result = await userService.changeUserPassByEmail(email, password)
+        res.status(200).json({ status: 'ok', content: result })
+    } catch (err) {
+        res.status(500).json({ status: 'error' })
+    }
+}
+
 //GET USER STATS
 async function getUserStats(req, res) {
     const date = new Date();
@@ -84,6 +98,26 @@ async function getUserStats(req, res) {
     }
 }
 
+// VERIFY_TOKEN
+async function verifyUserToken(req, res) {
+    try {
+        const { id, token } = req.params
+        const user = await User.findOne({ _id: ObjectId(id) })
+        if (!user) return res.status(400).send({ message: 'Invaild link' })
+        const userToken = await Token.findOne({ userId: user._id, token })
+        if (!userToken) return res.status(400).send({ message: 'Invalid link' })
+        await User.findOneAndUpdate(
+            { _id: user._id },
+            { $set: { verified: true } },
+            { new: true }
+        );
+        await userToken.remove()
+        res.status(200).send({ message: 'Email verified successfully' })
+    } catch (error) {
+        res.status(500).json(error);
+    }
+}
+
 module.exports = {
     removeUser,
     updateUser,
@@ -91,4 +125,6 @@ module.exports = {
     getUsers,
     createUser,
     getUserStats,
+    changeUserPassByEmail,
+    verifyUserToken
 }

@@ -1,11 +1,10 @@
 const express = require("express");
 const http = require('http')
-const https = require('https')
-const fs = require('fs')
 const app = express();
 const dotenv = require("dotenv");
 const cookieParser = require('cookie-parser');
 const socketService = require("./services/socket.service")
+const mongoose = require('mongoose')
 app.use(cookieParser());
 
 
@@ -50,20 +49,6 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 
-// Certificate
-// const privateKey = fs.readFileSync('/etc/letsencrypt/live/qleads.mobi/privkey.pem', 'utf8');
-// const certificate = fs.readFileSync('/etc/letsencrypt/live/qleads.mobi/cert.pem', 'utf8');
-// const ca = fs.readFileSync('/etc/letsencrypt/live/qleads.mobi/chain.pem', 'utf8');
-
-// const credentials = {
-//     key: privateKey,
-//     cert: certificate,
-// };
-
-// const options = {
-//     key: fs.readFileSync(path.join(__dirname, 'cert', 'privkey.pem')),
-//     cert: fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem'))
-// }
 
 // Done
 app.use(express.json());
@@ -91,7 +76,13 @@ app.get('*', (req, res) => {
 });
 
 const port = process.env.PORT || 3030
-// let sslServer = https.createServer(options, app)
 let sslServer = http.createServer(app)
 socketService.socketConnect(sslServer)
-sslServer.listen(port, () => console.log('Listening on port ' + port))
+mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true, }).then(() => {
+    sslServer.listen(port, () => console.log('Listening on port ' + port))
+    console.log('Connected to MongoDB')
+}).catch((err) => {
+    console.log(err)
+})
+
+

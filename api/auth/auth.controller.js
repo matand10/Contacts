@@ -10,19 +10,10 @@ const cryptr = new Cryptr(process.env.SECRET1 || 'Secret-Puk-1234')
 async function register(req, res) {
     try {
         const user = req.body
-        const saltRounds = 10
-        const hash = await bcrypt.hash(user.password, saltRounds)
-        const content = {
-            username: user.username,
-            password: hash,
-            fullname: user.fullname,
-            email: user.email
-        }
-
-        if (!user.username || !user.password) return Promise.reject('fullname, username and password are required!')
-        const newUser = new User(content)
-        let userToAdd = await userService.create(newUser)
-
+        if (!user.username || !user.password || !user.email) return Promise.reject('fullname, username and password are required!')
+        const userInDB = await User.findOne({ email: user.email });
+        if (userInDB) return res.status(409).send({ status: 'error', message: 'User with given email already exist!' })
+        let userToAdd = await userService.create(user)
         const loginToken = getLoginToken(userToAdd)
         res.cookie('loginToken', loginToken)
         res.status(201).json({ status: 'ok' });
@@ -35,10 +26,17 @@ async function register(req, res) {
 async function login(req, res) {
     const { username, password } = req.body
     try {
+
         const user = await authService.login(username)
-        if (!user) return res.status(401).json("Wrong credentials!")
+        if (!user) return res.status(401).json({ errorMessage: "Wrong credentials!", status: 'error' })
         const match = await bcrypt.compare(password, user.password)
-        if (!match) return res.status(401).json("Wrong credentials!")
+        if (!match) return res.status(401).json({ errorMessage: "Wrong credentials!", status: 'error' })
+        else if (!user.verified) {
+            console.log('user', user)
+            await userService.sendEmailVerification(user)
+            return res.status(401).json({ errorMessage: 'Please verify your account first!', status: 'error' })
+        }
+
         const loginToken = getLoginToken(user)
         delete user.password
         res.cookie('loginToken', loginToken)
@@ -66,9 +64,28 @@ async function isAdmin(req, res) {
     }
 }
 
+async function recoveryEmail(req, res) {
+    try {
+        await authService.sendEmail(req.body)
+        res.send({ status: 'ok' })
+    } catch (err) {
+        res.status(500).send({ err: 'Failed to send email' })
+    }
+}
+
+async function isValidOTP(req, res) {
+    try {
+        const result = authService.isOTPValid(req.body)
+        res.status(200).send({ status: 'ok', content: result })
+    } catch (err) {
+        res.status(500).send({ err: 'Failed to check OTP' })
+    }
+}
+
 function getLoginToken(user) {
     return cryptr.encrypt(JSON.stringify({ _id: user._id, isAdmin: user.isAdmin }))
 }
+
 
 module.exports = {
     register,
@@ -76,4 +93,6 @@ module.exports = {
     logout,
     isAdmin,
     getLoginToken,
+    recoveryEmail,
+    isValidOTP
 }

@@ -1,6 +1,13 @@
 
 const ObjectId = require('mongodb').ObjectId
 const bcrypt = require('bcrypt')
+const Token = require('../../models/Token')
+const config = require('../../config')
+
+const emailService = require('../../services/email.service')
+const authService = require('../auth/auth.service')
+const utilService = require('../../services/util.service')
+
 const COLLECTION_KEY = 'user'
 
 // Services
@@ -117,8 +124,31 @@ async function add(userCred) {
 
 async function create(user) {
     try {
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.insertOne(user)
+        const saltRounds = Number(process.env.SALT)
+        const hash = await bcrypt.hash(user.password, saltRounds)
+        const content = {
+            username: user.username,
+            password: hash,
+            fullname: user.fullname,
+            email: user.email,
+            phone: user.phone
+        }
+
+        const newUser = new User(content)
+        const savedUser = await newUser.save()
+        // const hashToken = await bcrypt.hash(utilService.generateRandomNumber(10), saltRounds)
+        try {
+            const token = await new Token({
+                userId: savedUser._id,
+                token: utilService.generateRandomNumber(10)
+            })
+            const savedToken = await token.save()
+            const url = `${config.baseUrl}users/${savedUser._id}/verify/${savedToken.token}`
+            await emailService(savedUser.email, "Verify Email", url)
+        } catch (err) {
+            throw new Error('Cannot send verification link')
+        }
+
         return user
     } catch (err) {
         throw err
@@ -207,6 +237,42 @@ async function addNotification(user, type) {
     }
 }
 
+async function changeUserPassByEmail(email, password) {
+    try {
+        const collection = await dbService.getCollection(COLLECTION_KEY)
+        const user = await collection.findOne({ 'email': 'matandamary10@gmail.com' })
+        const encryptedPass = await authService.encodeUserPassword(password)
+        const userToSave = { ...user, password: encryptedPass }
+        if (user) {
+            await collection.updateOne({ '_id': user._id }, { $set: userToSave })
+            return true
+        } else {
+            throw new Error('Cannot find user matching this email:', email)
+        }
+    } catch (err) {
+        throw err
+    }
+}
+
+async function sendEmailVerification(user) {
+    try {
+        let userToken = await Token.findOne({ userId: new ObjectId(user._id) })
+
+        if (!userToken) {
+            const token = await new Token({
+                userId: user._id,
+                token: utilService.generateRandomNumber(10)
+            })
+            userToken = await token.save()
+        }
+
+        const url = `${config.baseUrl}users/${user._id}/verify/${userToken.token}`
+        await emailService(user.email, "Verify Email", url)
+    } catch (error) {
+        throw error
+    }
+}
+
 function _buildCriteria(filterBy) {
     const criteria = {}
     if (filterBy.createdAt) {
@@ -246,4 +312,6 @@ module.exports = {
     removeContactTransaction,
     addContactTransactionSale,
     addNotification,
+    changeUserPassByEmail,
+    sendEmailVerification,
 }
