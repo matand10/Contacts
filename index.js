@@ -7,7 +7,6 @@ const socketService = require("./services/socket.service")
 const mongoose = require('mongoose')
 app.use(cookieParser());
 
-
 dotenv.config();
 const authRoute = require("./api/auth/auth.routes");
 const userRoute = require("./api/user/user.routes");
@@ -23,10 +22,6 @@ const contactTransactionRoute = require("./api/contactTransaction/contactTransac
 const creditRoute = require("./api/credit/credit.routes")
 const contactRequestRoute = require("./api/contactRequest/contactRequest.routes")
 const userWaitlist = require("./api/userWaitlist/userWaitlist.routes")
-// Not Formatted
-// const cartRoute = require("./routes/cart");
-// const productRoute = require("./routes/product");
-// const orderRoute = require("./routes/order");
 
 const cors = require("cors");
 const path = require("path");
@@ -49,9 +44,6 @@ const corsOptions = {
     credentials: true
 }
 app.use(cors(corsOptions))
-
-
-// Done
 app.use(express.json());
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
@@ -67,12 +59,7 @@ app.use("/api/contact/transaction", contactTransactionRoute)
 app.use("/api/contact/request", contactRequestRoute)
 app.use("/api/payment", stripeRoute);
 app.use("/api/user_waitlist", userWaitlist);
-// Not Formatted
-// app.use("/api/product", productRoute);
-// app.use("/api/carts", cartRoute);
-// app.use("/api/orders", orderRoute);
 app.use(express.static('public'));
-
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });

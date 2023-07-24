@@ -1,15 +1,3 @@
-// const authService = require('../services/auth.service')
-
-// async function requireAdmin(req, res, next) {
-//     const { user } = JSON.parse(req.body.data)
-//     if (!user || !user.isAdmin) return res.status(401).send('Not Authenticated')
-//     next()
-// }
-
-// module.exports = {
-//     requireAdmin
-// }
-
 const dbService = require('../services/db.service')
 const Cryptr = require('cryptr')
 const cryptr = new Cryptr(process.env.SECRET1 || 'Secret-Puk-1234')

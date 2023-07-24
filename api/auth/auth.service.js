@@ -4,11 +4,7 @@ const nodemailer = require("nodemailer")
 const { getOTPEmail } = require('../../constants/email')
 const bcrypt = require('bcrypt')
 const User = require('../user/user.model')
-
-const dbService = require('../../services/db.service')
 const utilService = require('../../services/util.service')
-
-const TEMP_OTP = {}
 
 function validateToken(res) {
     try {
@@ -33,11 +29,10 @@ async function login(username) {
 async function sendEmail({ email }) {
     try {
         const OTP = utilService.generateRandomNumber(4)
-        TEMP_OTP.email = email
-        TEMP_OTP.otp = OTP
+        global.otp = OTP
 
         const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
+            host: process.env.HOST,
             port: 465,
             secure: true,
             auth: {
@@ -47,7 +42,7 @@ async function sendEmail({ email }) {
         });
 
         const message = {
-            from: '"Fred Foo 👻" <matandamary10@gmail.com>',
+            from: '"Password Recover" <matandamary10@gmail.com>',
             to: email,
             subject: 'Hello ✔',
             text: 'Hello world?',
@@ -62,9 +57,9 @@ async function sendEmail({ email }) {
 
 function isOTPValid({ OTP }) {
     const userOTP = OTP.join('')
-    const { email, otp } = TEMP_OTP
-    TEMP_OTP = {}
-    return userOTP === otp
+    const CODE = global.otp
+    delete global.opt
+    return userOTP === CODE
 }
 
 async function encodeUserPassword(password) {
