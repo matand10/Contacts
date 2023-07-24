@@ -24,6 +24,7 @@ const UserSchema = new mongoose.Schema(
         notifications: { type: Array, default: [] },
         income: { type: Number, default: 0 },
         verified: { type: Boolean, default: false },
+        isApproved: { type: Boolean, default: false },
     },
 );
 

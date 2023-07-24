@@ -1,9 +1,11 @@
 const User = require("../user/user.model");
 const bcrypt = require('bcrypt')
-const userService = require('../user/user.service');
-const authService = require('./auth.service')
 const Cryptr = require('cryptr')
 const cryptr = new Cryptr(process.env.SECRET1 || 'Secret-Puk-1234')
+
+const userService = require('../user/user.service');
+const authService = require('./auth.service')
+const userWaitlistService = require('../userWaitlist/userWaitlist.service')
 
 
 // REGISTER
@@ -14,6 +16,7 @@ async function register(req, res) {
         const userInDB = await User.findOne({ email: user.email });
         if (userInDB) return res.status(409).send({ status: 'error', message: 'User with given email already exist!' })
         let userToAdd = await userService.create(user)
+        await userWaitlistService.add(userToAdd)
         const loginToken = getLoginToken(userToAdd)
         res.cookie('loginToken', loginToken)
         res.status(201).json({ status: 'ok' });
@@ -32,9 +35,11 @@ async function login(req, res) {
         const match = await bcrypt.compare(password, user.password)
         if (!match) return res.status(401).json({ errorMessage: "Wrong credentials!", status: 'error' })
         else if (!user.verified) {
-            console.log('user', user)
             await userService.sendEmailVerification(user)
             return res.status(401).json({ errorMessage: 'Please verify your account first!', status: 'error' })
+        }
+        else if (!user.isApproved) {
+            return res.status(401).json({ errorMessage: 'Please wait for account approval', status: 'error' })
         }
 
         const loginToken = getLoginToken(user)

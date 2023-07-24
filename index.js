@@ -22,6 +22,7 @@ const creditTransactionRoute = require("./api/creditTransaction/creditTransactio
 const contactTransactionRoute = require("./api/contactTransaction/contactTransaction.routes")
 const creditRoute = require("./api/credit/credit.routes")
 const contactRequestRoute = require("./api/contactRequest/contactRequest.routes")
+const userWaitlist = require("./api/userWaitlist/userWaitlist.routes")
 // Not Formatted
 // const cartRoute = require("./routes/cart");
 // const productRoute = require("./routes/product");
@@ -65,6 +66,7 @@ app.use("/api/credit/transaction", creditTransactionRoute)
 app.use("/api/contact/transaction", contactTransactionRoute)
 app.use("/api/contact/request", contactRequestRoute)
 app.use("/api/payment", stripeRoute);
+app.use("/api/user_waitlist", userWaitlist);
 // Not Formatted
 // app.use("/api/product", productRoute);
 // app.use("/api/carts", cartRoute);

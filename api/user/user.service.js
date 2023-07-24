@@ -149,7 +149,7 @@ async function create(user) {
             throw new Error('Cannot send verification link')
         }
 
-        return user
+        return savedUser
     } catch (err) {
         throw err
     }
