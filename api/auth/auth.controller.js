@@ -6,6 +6,7 @@ const cryptr = new Cryptr(process.env.SECRET1 || 'Secret-Puk-1234')
 const userService = require('../user/user.service');
 const authService = require('./auth.service')
 const userWaitlistService = require('../userWaitlist/userWaitlist.service')
+const waitlistStatus = require("../../constants/waitlistStatus")
 
 
 // REGISTER
@@ -38,7 +39,7 @@ async function login(req, res) {
             await userService.sendEmailVerification(user)
             return res.status(401).json({ errorMessage: 'Please verify your account first!', status: 'error' })
         }
-        else if (!user.isApproved) {
+        else if (user.approveStatus !== waitlistStatus.APPROVED) {
             return res.status(401).json({ errorMessage: 'Please wait for account approval', status: 'error' })
         }
 

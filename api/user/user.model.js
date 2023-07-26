@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const waitlistStatus = require("../../constants/waitlistStatus")
 
 const UserSchema = new mongoose.Schema(
     {
@@ -24,7 +25,7 @@ const UserSchema = new mongoose.Schema(
         notifications: { type: Array, default: [] },
         income: { type: Number, default: 0 },
         verified: { type: Boolean, default: false },
-        isApproved: { type: Boolean, default: false },
+        approveStatus: { type: String, default: waitlistStatus.PENDING },
     },
 );
 

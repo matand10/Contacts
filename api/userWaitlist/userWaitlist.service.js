@@ -1,6 +1,7 @@
 const UserWaitlist = require('./userWaitlist.model')
 const User = require('../user/user.model')
 const ObjectId = require('mongodb').ObjectId
+const WaitlistStatus = require('../../constants/waitlistStatus')
 
 async function get() {
     try {
@@ -16,9 +17,9 @@ async function update(user, status) {
         const userToApprove = {
             ...user,
             _id: ObjectId(user._id),
-            isApproved: status
+            approveStatus: status
         }
-        await User.findByIdAndUpdate(ObjectId(user.userId), { $set: { isApproved: status } })
+        await User.findByIdAndUpdate(ObjectId(user.userId), { $set: { approveStatus: status } })
         const res = await UserWaitlist.findByIdAndUpdate(ObjectId(user._id), { ...userToApprove }, { new: true })
         return res
     } catch (err) {
@@ -41,10 +42,10 @@ async function add(user) {
     }
 }
 
-async function remove(jobTitleId) {
+async function remove(user) {
     try {
-        const collection = await dbService.getCollection('jobTitle')
-        await collection.deleteOne({ '_id': ObjectId(jobTitleId) })
+        await UserWaitlist.deleteOne({ _id: user._id })
+        await User.findByIdAndUpdate(ObjectId(user.userId), { $set: { approveStatus: WaitlistStatus.REJECTED } })
     } catch (err) {
         throw err
     }

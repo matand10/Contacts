@@ -25,8 +25,8 @@ async function update(req, res) {
 // DELETE
 async function remove(req, res) {
     try {
-        const { id } = req.body
-        await userWaitlistService.remove(id)
+        const { user } = req.body
+        await userWaitlistService.remove(user)
         res.status(200).json({ status: 'ok' });
     } catch (err) {
         res.status(500).json(err);
