@@ -10,4 +10,4 @@ const ContactRequestSchema = new mongoose.Schema(
     },
 );
 
-module.exports = mongoose.model("ContactRequest", ContactRequestSchema);
+module.exports = mongoose.model("ContactRequest", ContactRequestSchema, "contact_request");

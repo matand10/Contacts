@@ -9,5 +9,5 @@ const CreditSchema = new mongoose.Schema(
     },
 );
 
-const ChannelModel = mongoose.model("Credit", CreditSchema);
+const ChannelModel = mongoose.model("Credit", CreditSchema, "credit");
 module.exports = ChannelModel

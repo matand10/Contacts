@@ -6,4 +6,4 @@ const TerritorySchema = new mongoose.Schema(
     },
 );
 
-module.exports = mongoose.model("Territory", TerritorySchema);
+module.exports = mongoose.model("Territory", TerritorySchema, "territory");

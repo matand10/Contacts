@@ -10,4 +10,4 @@ const ContactTransactionSchema = new mongoose.Schema(
     },
 );
 
-module.exports = mongoose.model("ContactTransaction", ContactTransactionSchema);
+module.exports = mongoose.model("ContactTransaction", ContactTransactionSchema, "contact_transaction");
