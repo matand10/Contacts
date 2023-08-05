@@ -19,7 +19,7 @@ async function register(req, res) {
         let userToAdd = await userService.create(user)
         await userWaitlistService.add(userToAdd)
         const loginToken = getLoginToken(userToAdd)
-        res.cookie('loginToken', loginToken)
+        res.cookie('loginToken', loginToken, { sameSite: 'none', secure: true })
         res.status(201).json({ status: 'ok' });
     } catch (err) {
         res.status(500).json(err);
@@ -45,7 +45,7 @@ async function login(req, res) {
 
         const loginToken = getLoginToken(user)
         delete user.password
-        res.cookie('loginToken', loginToken)
+        res.cookie('loginToken', loginToken, { sameSite: 'none', secure: true })
         res.status(200).json(user);
     } catch (err) {
         res.status(500).json(err);
