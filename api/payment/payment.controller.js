@@ -1,11 +1,14 @@
+const ContactTransaction = require("../contactTransaction/contactTransaction.model")
+const purchaseStatus = require('../../constants/PurchaseStatus')
+const CreditTransaction = require('../creditTransaction/creditTransaction.model')
+
 const userService = require("../user/user.service")
 const contactTransactionService = require("../contactTransaction/contactTransaction.service")
 const contactSaleService = require("../../services/contactSale.service")
+const creditTransactionService = require("../creditTransaction/creditTransaction.service")
 const contactService = require("../contact/contact.service")
 const socketService = require("../../services/socket.service")
-const ContactTransaction = require("../contactTransaction/contactTransaction.model")
-const purchaseStatus = require('../../constants/PurchaseStatus')
-const creditTransactionService = require("../credit/credit.service")
+const paymentService = require("./payment.service")
 
 
 //CREATE
@@ -17,10 +20,11 @@ async function createCreditPayment(req, res) {
         // Process the payment for each credit
         const payments = await Promise.all(
             transactions.map(async (credit) => {
-                const payment = await paymentService.processPayment(credit);
+                const payment = paymentService.processPayment(credit);
                 return payment;
             })
         );
+
 
         // Checks if the payment successed
         const isPaymentCancled = payments.some(payment => !payment.success)
@@ -28,7 +32,6 @@ async function createCreditPayment(req, res) {
 
         // Modeling the transactions
         const creditsToSave = transactions.map(transaction => new CreditTransaction({ ...transaction }))
-
 
         // Update the credit_transaction collection for each credit
         const credits = await creditTransactionService.add(creditsToSave)
@@ -45,7 +48,6 @@ async function createCreditPayment(req, res) {
 
 async function createContactPurchase(req, res) {
     try {
-        console.log('Hellooo')
         const { transaction, userId, type } = req.body
 
         // Checks user credits status

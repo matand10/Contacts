@@ -12,4 +12,4 @@ const CreditTransactionSchema = new mongoose.Schema(
     },
 );
 
-module.exports = mongoose.model("CreditTransaction", CreditTransactionSchema);
+module.exports = mongoose.model("CreditTransaction", CreditTransactionSchema, "credit_transaction");
