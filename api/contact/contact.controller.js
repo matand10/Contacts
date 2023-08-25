@@ -82,9 +82,8 @@ async function getContacts(req, res) {
 async function getContactByCategories(req, res) {
     const cat = req.params.category
     try {
-        const collection = await dbService.getCollection('contact')
-        const entities = await collection.find({ desc: getFirstLetterUppercase(cat) }).toArray()
-        res.status(200).json(entities)
+        const contacts = await contactService.getContactByCategories(getFirstLetterUppercase(cat))
+        res.status(200).json(contacts)
     } catch (err) {
         res.status(500).json(err);
         throw err

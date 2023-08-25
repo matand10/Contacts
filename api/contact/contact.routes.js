@@ -8,7 +8,7 @@ router.post('/user', validateToken, getUserContacts)
 router.post('/create', verifyTokenAndAdmin, add)
 router.post('/update/:id', verifyTokenAndAdmin, update)
 router.post('/:id', verifyTokenAndAdmin, remove)
-router.post('/:category', getContactByCategories)
+router.get('/:category', getContactByCategories)
 router.get('/find/:id', getById)
 
 module.exports = router

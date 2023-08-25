@@ -106,6 +106,15 @@ async function getContactsByUserId(userId) {
     }
 }
 
+async function getContactByCategories(category) {
+    try {
+        const contacts = await Contact.find({ category })
+        return contacts
+    } catch (error) {
+        throw error
+    }
+}
+
 function _buildCriteria(filterBy) {
     const criteria = {}
 
@@ -130,4 +139,5 @@ module.exports = {
     update,
     updateContactTransaction,
     getContactsByUserId,
+    getContactByCategories,
 }
