@@ -37,7 +37,8 @@ const corsOptions = {
         'https://qleads.info',
         'http://qleads.info',
         'http://qleads.info:80',
-        'https://qleads-mobile-bljak.ondigitalocean.app',
+        'https://qleads-web-x8xrg.ondigitalocean.app/',
+        // 'https://qleads-mobile-bljak.ondigitalocean.app',
         'https://qleads.mobi',
         'https://qleads.mobi:80'
     ],
