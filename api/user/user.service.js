@@ -71,7 +71,6 @@ async function update(updatedUser) {
     try {
         // peek only updatable fields!
         const userToSave = {
-            _id: ObjectId(updatedUser._id),
             username: updatedUser.username,
             fullname: updatedUser.fullname,
             email: updatedUser.email,
@@ -86,11 +85,15 @@ async function update(updatedUser) {
             contactUploads: updatedUser.contactUploads,
             searchHistory: updatedUser.searchHistory,
             notifications: updatedUser.notifications,
-            income: updatedUser.income
+            income: updatedUser.income,
+            countryPreferences: updatedUser.countryPreferences,
         }
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.updateOne({ '_id': userToSave._id }, { $set: userToSave })
-        return updatedUser;
+        const savedUser = await User.findOneAndUpdate(
+            { _id: ObjectId(updatedUser._id) },
+            { $set: userToSave },
+            { new: true }
+        )
+        return savedUser;
     } catch (err) {
         throw err
     }
