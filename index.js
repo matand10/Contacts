@@ -63,9 +63,11 @@ app.use("/api/payment", stripeRoute);
 app.use("/api/user_waitlist", userWaitlist);
 app.use("/api/country", country);
 app.use(express.static('public'));
+
 app.get('/web', (req, res) => {
     res.sendFile(path.join(__dirname, 'static/index.html'));
 });
+
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
