@@ -32,13 +32,13 @@ const corsOptions = {
     origin: [
         'http://127.0.0.1:3000',
         'http://localhost:3000',
+        'http://localhost:3030',
         'https://164.92.245.54:80',
         'https://qleads.info:80',
         'https://qleads.info',
         'http://qleads.info',
         'http://qleads.info:80',
         'https://qleads-web-x8xrg.ondigitalocean.app',
-        // 'https://qleads-mobile-bljak.ondigitalocean.app',
         'https://qleads.mobi',
         'https://qleads.mobi:80'
     ],
@@ -63,6 +63,9 @@ app.use("/api/payment", stripeRoute);
 app.use("/api/user_waitlist", userWaitlist);
 app.use("/api/country", country);
 app.use(express.static('public'));
+app.get('/web', (req, res) => {
+    res.sendFile(path.join(__dirname, 'static/index.html'));
+});
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
