@@ -48,22 +48,19 @@ async function createCreditPayment(req, res) {
 
 async function createContactPurchase(req, res) {
     try {
-        const { transaction, userId, type } = req.body
-
+        const { transactions, userId, type } = req.body
         // Checks user credits status
         const purchaseUser = await userService.getById(userId)
         if (!purchaseUser) return res.status(401).json({ status: 'User not found' })
-        else if (purchaseUser.credits < transaction.priceInCredit) return res.status(409).json({ status: 'error' })
+        else if (!userService.isUserHasCredits(transactions, purchaseUser)) return res.status(409).json({ status: 'error' })
 
         // Modeling the transactions
-        const newTransaction = { ...transaction, type, userId }
-        const contactTransToSave = new ContactTransaction(newTransaction)
+        const contactTransToSave = transactions.map(transaction => new ContactTransaction({ ...transaction, type, userId }))
 
         // Updating user agent in credit and the relevant transaction
-        if (transaction?.contact) {
+        contactTransToSave.forEach(async transaction => {
             const agentId = transaction?.contact?.agent?._id
             const agentUser = await userService.getById(agentId)
-
 
             if (agentUser) {
                 const { saleTransaction, status, updatedUser } = await userService.addContactTransactionSale(contactTransToSave, agentUser)
@@ -73,15 +70,15 @@ async function createContactPurchase(req, res) {
                     socketService.emitToUser({ type: 'set-user-contact', data: newNotification, userId: agentId })
                 }
             }
-        }
+            // Update the contact_transaction collection for each contact
+            await contactTransactionService.add(transaction)
 
-        // Update the contact_transaction collection for each contact
-        await contactTransactionService.add(contactTransToSave)
+            // Update the contact
+            await contactService.updateContactTransaction(transaction)
 
-        // Update the contact
-        await contactService.updateContactTransaction(contactTransToSave)
+        })
 
-        //  Update the user's credit transaction history 
+        // Update the user's credit transaction history 
         const { updatedUser, status } = await userService.addContactTransaction(contactTransToSave, purchaseUser)
         if (status !== purchaseStatus.success) return res.status(401)
         res.status(200).json({ status: 'ok', content: updatedUser })

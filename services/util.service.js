@@ -4,7 +4,8 @@ module.exports = {
     getFirstLetterUppercase,
     getUsersOneWeekAgo,
     getTransactionsContactValueInCredit,
-    generateRandomNumber
+    generateRandomNumber,
+    getContactValueInCredit
 }
 
 function getFirstLetterUppercase(str) {
@@ -22,6 +23,10 @@ function getUsersOneWeekAgo(users) {
 
 function getTransactionsContactValueInCredit(contactTransactions) {
     return contactTransactions.price / CREDIT_VALUE
+}
+
+function getContactValueInCredit(price) {
+    return price / CREDIT_VALUE
 }
 
 function generateRandomNumber(length) {

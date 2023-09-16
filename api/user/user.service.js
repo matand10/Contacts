@@ -158,6 +158,18 @@ async function create(user) {
     }
 }
 
+async function addUserPruchase(purchase) {
+    try {
+        const user = await getById(purchase.buyer)
+        user.credits -= purchase.purchasePrice
+        user.purchases.unshift(purchase)
+        const savedUser = await update(user)
+        return { status: purchaseStatus.success, updatedUser: savedUser }
+    } catch (error) {
+        throw error
+    }
+}
+
 async function addCreditTransaction(transactions, userId) {
     try {
         let user = await getById(userId)
@@ -172,15 +184,15 @@ async function addCreditTransaction(transactions, userId) {
     }
 }
 
-async function addContactTransaction(transaction, user) {
+async function addContactTransaction(transactions, user) {
     try {
-        let savedUser
         const updatedUser = { ...user }
-        updatedUser.credits -= transaction.priceInCredit
-        updatedUser.contactTransactions.unshift(transaction)
+        transactions.forEach(transaction => {
+            updatedUser.credits -= transaction.priceInCredit
+            updatedUser.contactTransactions.unshift(transaction)
+        })
         await update(updatedUser)
-        savedUser = { status: purchaseStatus.success, updatedUser }
-        return savedUser
+        return { status: purchaseStatus.success, updatedUser }
     } catch (err) {
         throw err
     }
@@ -199,7 +211,7 @@ async function addContactTransactionSale(transaction, user) {
         }
 
         const saleTransaction = new ContactSale(updatedSale)
-        if (transaction.contact.agent._id === user._id.toString()) {
+        if (transaction?.contact?.agent?._id === user?._id.toString()) {
             userToUpdate.income += (CREDIT_VALUE / 2)
             userToUpdate.contactTransactions.unshift(saleTransaction)
             const updatedUser = await update(userToUpdate)
@@ -207,6 +219,17 @@ async function addContactTransactionSale(transaction, user) {
         } else return { status: purchaseStatus.failed }
     } catch (err) {
         throw err
+    }
+}
+
+async function updateAgentCredits(agentUser, credits) {
+    try {
+        const userToUpdate = { ...agentUser }
+        userToUpdate.income += (credits / 2)
+        const updatedUser = await update(userToUpdate)
+        return updatedUser
+    } catch (error) {
+        throw error
     }
 }
 
@@ -276,6 +299,12 @@ async function sendEmailVerification(user) {
     }
 }
 
+const isUserHasCredits = (transactions, user) => {
+    const sum = transactions.reduce((acc, trans) => acc += trans.contact.price, 0)
+    if (user.credits >= utilService.getContactValueInCredit(sum)) return true
+    else return false
+}
+
 function _buildCriteria(filterBy) {
     const criteria = {}
     if (filterBy.createdAt) {
@@ -317,4 +346,7 @@ module.exports = {
     addNotification,
     changeUserPassByEmail,
     sendEmailVerification,
+    isUserHasCredits,
+    updateAgentCredits,
+    addUserPruchase,
 }
