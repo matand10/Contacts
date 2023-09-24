@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.css": "/static/css/main.b5273720.chunk.css",
-    "main.js": "/static/js/main.ff135ae7.chunk.js",
-    "main.js.map": "/static/js/main.ff135ae7.chunk.js.map",
+    "main.css": "/static/css/main.0d4e8449.chunk.css",
+    "main.js": "/static/js/main.eeb8034c.chunk.js",
+    "main.js.map": "/static/js/main.eeb8034c.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.9412c5a0.js",
     "runtime-main.js.map": "/static/js/runtime-main.9412c5a0.js.map",
     "static/js/2.896e23e5.chunk.js": "/static/js/2.896e23e5.chunk.js",
     "static/js/2.896e23e5.chunk.js.map": "/static/js/2.896e23e5.chunk.js.map",
     "index.html": "/index.html",
-    "static/css/main.b5273720.chunk.css.map": "/static/css/main.b5273720.chunk.css.map",
+    "static/css/main.0d4e8449.chunk.css.map": "/static/css/main.0d4e8449.chunk.css.map",
     "static/js/2.896e23e5.chunk.js.LICENSE.txt": "/static/js/2.896e23e5.chunk.js.LICENSE.txt",
     "static/media/bank.84e3e5e5.png": "/static/media/bank.84e3e5e5.png",
     "static/media/goverment.9169357e.png": "/static/media/goverment.9169357e.png",
@@ -17,7 +17,7 @@
   "entrypoints": [
     "static/js/runtime-main.9412c5a0.js",
     "static/js/2.896e23e5.chunk.js",
-    "static/css/main.b5273720.chunk.css",
-    "static/js/main.ff135ae7.chunk.js"
+    "static/css/main.0d4e8449.chunk.css",
+    "static/js/main.eeb8034c.chunk.js"
   ]
 }
