@@ -16,6 +16,26 @@ async function add(contact) {
     }
 }
 
+async function addMany(contact) {
+    try {
+        let newContacts = []
+        contact.jobTitle.forEach((_, idx) => {
+            const currentJobTitle = contact.jobTitle[idx]
+            const newContact = new Contact({ ...contact, jobTitle: currentJobTitle })
+            newContacts.push(newContact)
+        })
+        if (newContacts.length) {
+            const savedContacts = await Contact.insertMany(newContacts)
+            return savedContacts
+        } else {
+            return []
+        }
+    } catch (err) {
+        console.log('err', err)
+        throw err
+    }
+}
+
 async function remove(entitiyId) {
     try {
         const collection = await dbService.getCollection(COLLECTION_KEY)
@@ -136,6 +156,7 @@ module.exports = {
     getById,
     remove,
     add,
+    addMany,
     update,
     updateContactTransaction,
     getContactsByUserId,

@@ -28,6 +28,17 @@ async function add(req, res) {
     }
 }
 
+// ADD MANY
+async function addMany(req, res) {
+    try {
+        const { contact } = req.body
+        const savedContacts = await contactService.addMany(contact)
+        res.status(200).json({ status: 'ok', content: savedContacts })
+    } catch (err) {
+        res.status(500).json(err);
+    }
+}
+
 // UPDATE
 async function update(req, res) {
     const { contact } = req.body
@@ -92,6 +103,7 @@ async function getContactByCategories(req, res) {
 
 module.exports = {
     add,
+    addMany,
     update,
     remove,
     getById,
