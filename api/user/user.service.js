@@ -188,7 +188,7 @@ async function addContactTransaction(transactions, user) {
     try {
         const updatedUser = { ...user }
         transactions.forEach(transaction => {
-            updatedUser.credits -= transaction.priceInCredit
+            updatedUser.credits -= (transaction.priceInCredit * CREDIT_VALUE)
             updatedUser.contactTransactions.unshift(transaction)
         })
         await update(updatedUser)
@@ -235,15 +235,13 @@ async function updateAgentCredits(agentUser, credits) {
 
 async function removeContactTransaction(transaction, user) {
     try {
-        let savedUser
         const updatedUser = { ...user }
-        updatedUser.credits += transaction.priceInCredit
+        updatedUser.credits += (transaction.priceInCredit * CREDIT_VALUE)
         const updatedTransactions = updatedUser.contactTransactions.filter(trans => {
             return trans._id.toString() !== transaction._id.toString()
         })
         updatedUser.contactTransactions = updatedTransactions
-        await update(updatedUser)
-        savedUser = { status: purchaseStatus.success, updatedUser }
+        const savedUser = await update(updatedUser)
         return savedUser
     } catch (err) {
         throw err

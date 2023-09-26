@@ -11,7 +11,7 @@ const ContactSchema = new mongoose.Schema(
         inStock: { type: Boolean, required: false, default: false },
         name: { type: String, required: false, default: null },
         familyName: { type: String, required: false, default: null },
-        emails: { type: Array, required: false, default: [] },
+        emails: { type: [{ emailUrl: String, type: String }], required: false, default: [] },
         mobile: { type: String, required: false, default: null },
         phone: { type: String, required: false, default: null },
         linkedinLink: { type: String, required: false, default: null },

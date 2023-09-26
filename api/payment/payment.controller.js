@@ -90,7 +90,7 @@ async function createContactPurchase(req, res) {
 
 async function removeContactPurchase(req, res) {
     try {
-        const { transactionId, userId, type } = req.body
+        const { transactionId, userId } = req.body
 
         // Checks if user exists
         const user = await userService.getById(userId)
@@ -103,12 +103,12 @@ async function removeContactPurchase(req, res) {
 
         if (!contactTransaction) return res.status(404).json('You do not own this contact')
 
-        // Removing the contact purchase from the table
+        // Removing the contact purchase from the DB
         await contactTransactionService.remove(contactTransaction._id)
 
         // Update the user's credit transaction history 
-        await userService.removeContactTransaction(contactTransaction, user)
-        res.status(200).json({ status: 'ok' })
+        const updatedUser = await userService.removeContactTransaction(contactTransaction, user)
+        res.status(200).json({ status: 'ok', content: updatedUser })
     } catch (err) {
         res.status(500).json(err)
         throw err
