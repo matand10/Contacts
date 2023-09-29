@@ -26,7 +26,8 @@ const UserSchema = new mongoose.Schema(
         income: { type: Number, default: 0 },
         verified: { type: Boolean, default: false },
         approveStatus: { type: String, default: waitlistStatus.PENDING },
-        countryPreferences: { type: Array, default: [] }
+        countryPreferences: { type: Array, default: [] },
+        agentMessages: { type: Array, default: [] }
     },
     {
         toJSON: {

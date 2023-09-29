@@ -87,6 +87,7 @@ async function update(updatedUser) {
             notifications: updatedUser.notifications,
             income: updatedUser.income,
             countryPreferences: updatedUser.countryPreferences,
+            agentMessages: updatedUser.agentMessages,
         }
         const savedUser = await User.findOneAndUpdate(
             { _id: ObjectId(updatedUser._id) },

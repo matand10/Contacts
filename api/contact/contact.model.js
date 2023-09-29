@@ -19,6 +19,8 @@ const ContactSchema = new mongoose.Schema(
         img: { type: Object, required: false, default: {} },
         createdAt: { type: Date, required: true, default: new Date() },
         transactionHistory: { type: Array, required: false, default: [] },
+        averageRating: { type: Number, default: 0 },
+        numberOfRatings: { type: Number, default: 0 },
     },
 );
 

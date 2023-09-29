@@ -66,7 +66,9 @@ async function update(updatedContact) {
             img: updatedContact.img,
             createdAt: updatedContact.createdAt,
             agent: updatedContact.agent,
-            transactionHistory: updatedContact.transactionHistory
+            transactionHistory: updatedContact.transactionHistory,
+            averageRating: updatedContact.averageRating,
+            numberOfRatings: updatedContact.numberOfRatings,
         }
         const collection = await dbService.getCollection(COLLECTION_KEY)
         await collection.updateOne({ '_id': contactToSave._id }, { $set: contactToSave })
@@ -135,6 +137,19 @@ async function getContactByCategories(category) {
     }
 }
 
+async function updateContactFeedback(feedback, totalAverageRating) {
+    try {
+        const { contactId, rating } = feedback
+        const contact = await getById(contactId)
+        contact.numberOfRatings += 1
+        contact.averageRating = +((totalAverageRating + rating) / contact.numberOfRatings).toFixed(1)
+        await update(contact)
+        return contact
+    } catch (error) {
+        throw error
+    }
+}
+
 function _buildCriteria(filterBy) {
     const criteria = {}
 
@@ -161,4 +176,5 @@ module.exports = {
     updateContactTransaction,
     getContactsByUserId,
     getContactByCategories,
+    updateContactFeedback,
 }
