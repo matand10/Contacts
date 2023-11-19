@@ -23,7 +23,7 @@ async function create(req, res) {
         }
         delete newFeedback.contactId
 
-        // Save the feedback in the collection
+        // Save the feedback in the feedback collection
         const savedFeedback = await feedbackService.add(newFeedback)
         res.status(200).json({ status: 'ok', content: savedFeedback });
     } catch (err) {

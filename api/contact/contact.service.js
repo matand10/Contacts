@@ -31,7 +31,6 @@ async function addMany(contact) {
             return []
         }
     } catch (err) {
-        console.log('err', err)
         throw err
     }
 }
