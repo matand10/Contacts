@@ -3,15 +3,15 @@ const supportchatService = require("./supportChat.service")
 //CREATE
 async function create(req, res) {
     try {
-        const { userId, text, isUserSender } = req.body
+        const { userId, message, isUserSender } = req.body
         const userChat = await supportchatService.getById(userId)
         let newMessage = null
 
         if (userChat) {
-            newMessage = await supportchatService.addMessageToChat(userChat, text, isUserSender)
+            newMessage = await supportchatService.addMessageToChat(userChat, message, isUserSender)
         } else {
-            const newChatWithNewMessage = await supportchatService.createChat(userChat, text)
-            newMessage = await supportchatService.addMessageToChat(newChatWithNewMessage.chatId, text, isUserSender)
+            const newChatWithNewMessage = await supportchatService.createChat(userChat, message)
+            newMessage = await supportchatService.addMessageToChat(newChatWithNewMessage.chatId, message, isUserSender)
         }
 
         res.status(200).json({ status: 'ok', content: newMessage });
@@ -31,28 +31,6 @@ async function addAdminMsg(req, res) {
     }
 }
 
-// // //UPDATE
-// async function update(req, res) {
-//     try {
-//         const { jobTitle } = JSON.parse(req.body.data)
-//         await supportchatService.update(jobTitle)
-//         res.status(200).json({ status: 'ok' });
-//     } catch (err) {
-//         res.status(500).json(err);
-//     }
-// }
-
-// // DELETE
-// async function remove(req, res) {
-//     try {
-//         const { id } = JSON.parse(req.body.data)
-//         await supportchatService.remove(id)
-//         res.status(200).json({ status: 'ok' });
-//     } catch (err) {
-//         res.status(500).json(err);
-//     }
-// }
-
 // GET ALL
 async function query(req, res) {
     try {
@@ -70,10 +48,20 @@ async function query(req, res) {
     }
 }
 
+// GET BY ID
+async function getById(req, res) {
+    try {
+        const chatId = req.params.id;
+        supportChat = await supportchatService.getById(chatId)
+        res.status(200).json({ status: 'ok', content: supportChat })
+    } catch (err) {
+        res.status(500).json(err);
+    }
+}
+
 module.exports = {
     query,
     create,
     addAdminMsg,
-    // remove,
-    // update
+    getById,
 };

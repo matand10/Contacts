@@ -3,6 +3,9 @@ const Cryptr = require('cryptr')
 const cryptr = new Cryptr(process.env.SECRET1 || 'Secret-Puk-1234')
 
 function validateToken(req, res, next) {
+    const token = req.cookies.loginToken
+    if (!token) return res.status(401).json("You are not authenticated!")
+
     const json = cryptr.decrypt(req.cookies.loginToken)
     const loggedinUser = JSON.parse(json)
     if (loggedinUser) return next()

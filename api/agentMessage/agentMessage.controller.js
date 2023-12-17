@@ -27,11 +27,15 @@ async function getByContactId(req, res) {
 async function create(req, res) {
     try {
         const { user, body } = req
+
         // Checks if there is a userId
         if (!user._id) return res.status(410).json({ status: 'error', message: 'User id is missing' })
 
         // Checks if the contact has agent
-        const contact = await contactService.getById(body.contact._id)
+        const contact = await contactService.getById(body.contactId)
+
+        if (!contact.agent) return res.status(410).json({ status: 'error', message: "Contact doesn't have an agent" })
+
         const { _id: agentId } = contact.agent
         if (!agentId) return res.status(410).json({ status: 'error', message: "Contact doesn't have an agent" })
 
@@ -55,6 +59,7 @@ async function create(req, res) {
         const savedEntity = await agentMessageService.add(content)
         res.status(200).json({ status: 'ok', content: { agentMessage: savedEntity, savedUser } })
     } catch (err) {
+        console.log('err', err)
         res.status(500).json(err);
     }
 }

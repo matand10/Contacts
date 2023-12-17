@@ -34,15 +34,19 @@ async function create(req, res) {
 //GET ALL FEEDBACKS
 async function get(req, res) {
     try {
-        const filterBy = req.query
+        const filterBy = req.body
         const feedbacks = await feedbackService.get(filterBy)
+
+        if (feedbacks.length === 1) return res.status(200).json({ state: 'ok', content: feedbacks[0] })
+        else if (!feedbacks.length) return res.status(200).json({ state: 'ok', content: null })
+
         res.status(200).json({ status: 'ok', content: feedbacks })
     } catch (err) {
         res.status(500).json({ status: 'error', message: 'Server error' });
     }
 }
 
-async function getUserFeedbacks(_, res) {
+async function getUserFeedbacks(req, res) {
     try {
         const users = await feedbackService.getUserFeedbacks()
         res.status(200).json({ status: 'ok', content: users })

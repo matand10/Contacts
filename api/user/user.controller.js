@@ -18,8 +18,9 @@ async function removeUser(req, res) {
 //UPDATE
 async function updateUser(req, res) {
     try {
-        const { updatedUser } = req.body
+        const updatedUser = req.body
         const savedUser = await userService.update(updatedUser)
+        console.log('savedUser', savedUser)
         res.status(200).json({ status: 'ok', content: savedUser })
     } catch (err) {
         res.status(500).json(err);

@@ -35,6 +35,7 @@ const corsOptions = {
     origin: [
         'http://127.0.0.1:3000',
         'http://localhost:3000',
+        'http://localhost:3001',
         'http://localhost:3030',
         'https://164.92.245.54:80',
         'https://qleads.info:80',
@@ -43,7 +44,8 @@ const corsOptions = {
         'http://qleads.info:80',
         'https://qleads-web-x8xrg.ondigitalocean.app',
         'https://qleads.mobi',
-        'https://qleads.mobi:80'
+        'https://qleads.mobi:80',
+        'http://127.0.0.1:5173',
     ],
     credentials: true
 }

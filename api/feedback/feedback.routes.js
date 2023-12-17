@@ -3,7 +3,7 @@ const { create, get, getUserFeedbacks } = require('./feedback.controller');
 const { verifyToken } = require('../../middlewares/requireAuth.middleware');
 const router = express.Router()
 
-router.get('/', verifyToken, get)
+router.post('/', verifyToken, get)
 router.get('/getUserFeedback', verifyToken, getUserFeedbacks)
 router.post('/create', verifyToken, create)
 

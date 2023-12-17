@@ -46,7 +46,7 @@ async function login(req, res) {
         const loginToken = getLoginToken(user)
         delete user.password
         res.cookie('loginToken', loginToken, { sameSite: 'none', secure: true })
-        res.status(200).json(user);
+        res.status(200).json({ status: 'ok', content: user });
     } catch (err) {
         res.status(500).json(err);
     }

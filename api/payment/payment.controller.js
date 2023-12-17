@@ -17,6 +17,7 @@ async function createCreditPayment(req, res) {
         const transactions = req.body
         const userId = req.user._id
 
+
         // Process the payment for each credit
         const payments = await Promise.all(
             transactions.map(async (credit) => {
@@ -25,11 +26,9 @@ async function createCreditPayment(req, res) {
             })
         );
 
-
         // Checks if the payment successed
         const isPaymentCancled = payments.some(payment => !payment.success)
         if (isPaymentCancled) return res.status(402)
-
         // Modeling the transactions
         const creditsToSave = transactions.map(transaction => new CreditTransaction({ ...transaction }))
 

@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkrick_react_two=self.webpackChunkrick_react_two||[]).push([[354],{5354:function(e,t,r){r.r(t);var c=r(885),s=r(2791),a=r(8502),n=r(2598),u=r(3329);t.default=function(){var e=(0,s.useState)("newest"),t=(0,c.Z)(e,2),r=t[0];t[1];return(0,u.jsx)("div",{className:"body-wrapper space-pb--55",children:(0,u.jsx)(a.Z,{sort:r,title:n.j.NEW_CONTACTS,count:10})})}}}]);
-//# sourceMappingURL=354.e5488ce9.chunk.js.map
