@@ -1,6 +1,7 @@
 const ObjectId = require('mongodb').ObjectId
 const SupportChat = require('./supportChat.model')
 const userService = require('../user/user.service')
+const apiUtilService = require('../../utils/api.utils')
 
 async function get(chatId = '') {
     try {
@@ -81,6 +82,25 @@ async function createChat(chat) {
     }
 }
 
+async function createRoom(userId) {
+    try {
+        const user = await userService.getById(userId)
+        if (!user) throw new Error(apiUtilService.buildErrorResponse('Cannot find user'))
+
+        const newChat = await new SupportChat({
+            chatId: user._id,
+            chatImg: user.imgUrl,
+            fullname: user.fullname,
+            username: user.username,
+            messages: [],
+        }).save()
+
+        return newChat;
+    } catch (error) {
+        throw error
+    }
+}
+
 
 function _buildCriteria(filterBy) {
     const criteria = {}
@@ -99,4 +119,5 @@ module.exports = {
     addMessageToChat,
     addAdminMessageToChat,
     createChat,
+    createRoom,
 }

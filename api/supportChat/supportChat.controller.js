@@ -51,8 +51,11 @@ async function query(req, res) {
 // GET BY ID
 async function getById(req, res) {
     try {
-        const chatId = req.params.id;
-        supportChat = await supportchatService.getById(chatId)
+        const userId = req.params.id;
+        supportChat = await supportchatService.getById(userId)
+
+        if (!supportChat) supportChat = await supportchatService.createRoom(userId)
+
         res.status(200).json({ status: 'ok', content: supportChat })
     } catch (err) {
         res.status(500).json(err);
