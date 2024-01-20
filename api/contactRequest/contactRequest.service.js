@@ -16,9 +16,8 @@ const COLLECTION_KEY = 'contact_request'
 async function query(filterBy = {}) {
     const criteria = _buildCriteria(filterBy)
     try {
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        const entities = await collection.find(criteria).toArray()
-        return entities
+        const agentContactsRequest = await ContactRequest.find(criteria)
+        return agentContactsRequest
     } catch (err) {
         throw err
     }
@@ -68,6 +67,7 @@ async function approveContact(entity) {
             // Updating request to approved
             entity.contact.inStock = true
             entity.status = requestStatus.APPROVED
+            entity.updatedAt = new Date()
 
             // Updating contact inStock
             await contactService.update(entity.contact)

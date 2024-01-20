@@ -20,7 +20,7 @@ async function getUserContacts(req, res) {
 // ADD
 async function add(req, res) {
     try {
-        const { contact } = req.body
+        const contact = req.body
         const savedContact = await contactService.add(contact)
         res.status(200).json({ status: 'ok', content: savedContact });
     } catch (err) {
@@ -41,13 +41,9 @@ async function addMany(req, res) {
 
 // UPDATE
 async function update(req, res) {
-    const { contact } = req.body
+    const contact = req.body
     try {
-        const id = ObjectId(contact._id)
-        delete contact._id
-        const collection = await dbService.getCollection('contact')
-        await collection.updateOne({ _id: id }, { $set: { ...contact } })
-        const updatedContact = await collection.findOne({ _id: id })
+        const updatedContact = await contactService.update(contact)
         res.status(200).json({ status: 'ok', content: updatedContact });
     } catch (err) {
         res.status(500).json(err);
@@ -57,10 +53,10 @@ async function update(req, res) {
 // //DELETE
 async function remove(req, res) {
     try {
-        const { id } = req.body
-        const collection = await dbService.getCollection('contact')
-        await collection.deleteOne({ _id: ObjectId(id) })
-        res.status(200).json({ status: 'ok' });
+        const { id } = req.params
+        if (!id) return res.status(500).json({ status: 'error', message: 'Cannot find contact ID' })
+        await contactService.remove(id)
+        res.status(200).json({ status: 'ok', message: 'Contact Deleted' });
     } catch (err) {
         res.status(500).json(err);
     }

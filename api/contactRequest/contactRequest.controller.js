@@ -14,9 +14,9 @@ async function create(req, res) {
 // //DELETE
 async function remove(req, res) {
     try {
-        const { id } = req.body
+        const { id } = req.params
         await contactRequestService.remove(id)
-        res.status(200).json({ status: 'ok' });
+        res.status(200).json({ status: 'ok', message: 'Agent request has deleted' });
     } catch (err) {
         res.status(500).json(err);
     }

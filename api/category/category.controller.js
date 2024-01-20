@@ -1,7 +1,7 @@
 const categoryService = require("./category.service")
 const jobTitleService = require("../jobTitle/jobTitle.service")
 const companyService = require("../company/company.service")
-const territoryService = require("../territory/territory.service")
+const countryService = require("../country/country.service")
 
 //CREATE
 async function create(req, res) {
@@ -52,8 +52,8 @@ async function getCategoriesManager(req, res) {
         const categories = await categoryService.get()
         const jobTitles = await jobTitleService.get()
         const companies = await companyService.get()
-        const territories = await territoryService.get()
-        const content = { categories, jobTitles, companies, territories }
+        const countries = await countryService.query()
+        const content = { categories, jobTitles, companies, countries }
 
         res.status(200).json({ status: 'ok', content })
     } catch (err) {

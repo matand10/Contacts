@@ -37,8 +37,7 @@ async function addMany(contact) {
 
 async function remove(entitiyId) {
     try {
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.deleteOne({ '_id': ObjectId(entitiyId) })
+        await Contact.deleteOne({ '_id': ObjectId(entitiyId) })
     } catch (err) {
         throw err
     }
@@ -69,9 +68,13 @@ async function update(updatedContact) {
             averageRating: updatedContact.averageRating,
             numberOfRatings: updatedContact.numberOfRatings,
         }
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.updateOne({ '_id': contactToSave._id }, { $set: contactToSave })
-        return updatedContact;
+        const savedContact = await Contact.findOneAndUpdate(
+            { _id: ObjectId(contactToSave._id) },
+            { $set: contactToSave },
+            { new: true }
+        )
+
+        return savedContact;
     } catch (err) {
         throw err
     }

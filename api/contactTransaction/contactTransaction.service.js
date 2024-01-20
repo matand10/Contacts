@@ -57,12 +57,22 @@ async function remove(entityId) {
     }
 }
 
-async function getUsersTransactionByContactId(contactTransId) {
+async function getUsersTransactionByContactId(usersId) {
     try {
+        console.log('usersId', usersId)
+        const usersMap = new Map()
+        usersId.forEach(userId => usersMap.set(userId, { fullname: null, counter: 0 }))
+
         const users = await Promise.all(
-            contactTransId.map(userId => userService.getById(userId))
+            usersId.map(async userId => {
+                res = await userService.getById(userId)
+                logg
+                usersMap.set(userId, { fullname: res?.fullname || res.username, counter: ++usersMap.get(userId).counter })
+                return usersMap
+            })
         )
-        return users
+        console.log('usersMap', usersMap)
+        return usersMap
     } catch (err) {
         throw err
     }

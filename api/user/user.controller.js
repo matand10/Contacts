@@ -19,8 +19,9 @@ async function removeUser(req, res) {
 async function updateUser(req, res) {
     try {
         const updatedUser = req.body
+        console.log('before save', updatedUser.imgUrl)
         const savedUser = await userService.update(updatedUser)
-        console.log('savedUser', savedUser)
+        console.log('after save', savedUser)
         res.status(200).json({ status: 'ok', content: savedUser })
     } catch (err) {
         res.status(500).json(err);
@@ -52,7 +53,7 @@ async function getUsers(req, res) {
 // CREATE USER
 async function createUser(req, res) {
     try {
-        const { userCred } = req.body
+        const userCred = req.body
         const savedUser = await userService.add(userCred)
         res.status(200).json({ status: 'ok', content: savedUser })
     } catch (err) {

@@ -5,7 +5,7 @@ const router = express.Router()
 
 router.get('/', query)
 router.post('/create', validateToken, create)
-router.post('/remove/:id', validateToken, remove)
+router.delete('/remove/:id', validateToken, remove)
 router.post('/update', verifyTokenAndAdmin, update)
 router.post('/reject', validateToken, reject)
 

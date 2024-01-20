@@ -128,8 +128,9 @@ async function add(userCred) {
 
 async function create(user) {
     try {
-        const saltRounds = Number(process.env.SALT)
+        const saltRounds = +process.env.SALT
         const hash = await bcrypt.hash(user.password, saltRounds)
+
         const content = {
             username: user.username,
             password: hash,

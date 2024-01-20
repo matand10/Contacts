@@ -35,7 +35,7 @@ async function add(user) {
             email: user.email,
             userId: ObjectId(user._id),
         }
-        const saveUserRequest = await new UserWaitlist(userRequestToSave).save()
+        const saveUserRequest = await UserWaitlist.create(userRequestToSave);
         return saveUserRequest
     } catch (err) {
         throw err

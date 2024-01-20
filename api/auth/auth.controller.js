@@ -14,10 +14,14 @@ async function register(req, res) {
     try {
         const user = req.body
         if (!user.username || !user.password || !user.email) return Promise.reject('fullname, username and password are required!')
+
         const userInDB = await User.findOne({ email: user.email });
         if (userInDB) return res.status(409).send({ status: 'error', message: 'User with given email already exist!' })
+
         let userToAdd = await userService.create(user)
+
         await userWaitlistService.add(userToAdd)
+
         const loginToken = getLoginToken(userToAdd)
         res.cookie('loginToken', loginToken, { sameSite: 'none', secure: true })
         res.status(201).json({ status: 'ok' });

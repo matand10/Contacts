@@ -2,8 +2,8 @@ const contactTransactionService = require("./contactTransaction.service");
 
 async function getUserTransactionByContactId(req, res) {
     try {
-        const { contactIds } = req.body
-        const users = await contactTransactionService.getUsersTransactionByContactId(contactIds)
+        const { usersId } = req.body
+        const users = await contactTransactionService.getUsersTransactionByContactId(usersId)
         res.status(200).json({ status: 'ok', content: users })
     } catch (err) {
         res.status(500).json(err);

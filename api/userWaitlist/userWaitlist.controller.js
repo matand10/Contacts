@@ -4,7 +4,9 @@ const userWaitlistService = require("./userWaitlist.service")
 async function create(req, res) {
     try {
         const { user } = req.body
-        const savedRequest = await userWaitlistService.add(jobTitle)
+        console.log('user', user)
+
+        const savedRequest = await userWaitlistService.add(user)
         res.status(200).json({ status: 'ok', content: savedRequest });
     } catch (err) {
         res.status(500).json(err);
@@ -14,8 +16,8 @@ async function create(req, res) {
 // //UPDATE
 async function update(req, res) {
     try {
-        const { user, status } = req.body
-        const updatedUser = await userWaitlistService.update(user, status)
+        const { pendingUser, status } = req.body
+        const updatedUser = await userWaitlistService.update(pendingUser, status)
         res.status(200).json({ status: 'ok', content: updatedUser });
     } catch (err) {
         res.status(500).json(err);
