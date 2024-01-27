@@ -3,8 +3,9 @@ const companyService = require("./company.service")
 //CREATE
 async function create(req, res) {
     try {
-        const { company } = req.body
-        const savedCompany = await companyService.add(company)
+        const payload = req.body
+        if (!payload.company || !payload.category) return res.status(422).json({ status: 'error', message: 'One of the fields are missing' })
+        const savedCompany = await companyService.add(payload)
         res.status(200).json({ status: 'ok', content: savedCompany });
     } catch (err) {
         res.status(500).json(err);

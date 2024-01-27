@@ -31,7 +31,9 @@ async function add(req, res) {
 // ADD MANY
 async function addMany(req, res) {
     try {
-        const { contact } = req.body
+        const contact = req.body
+        if (!contact.jobTitles.length) return res.status(406).json({ status: 'error', message: "Job Titles are required" })
+
         const savedContacts = await contactService.addMany(contact)
         res.status(200).json({ status: 'ok', content: savedContacts })
     } catch (err) {

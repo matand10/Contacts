@@ -3,8 +3,8 @@ const jobTitleService = require("./jobTitle.service")
 //CREATE
 async function create(req, res) {
     try {
-        const { jobTitle } = JSON.parse(req.body.data)
-        const savedJobTitle = await jobTitleService.add(jobTitle)
+        const payload = req.body
+        const savedJobTitle = await jobTitleService.add(payload)
         res.status(200).json({ status: 'ok', content: savedJobTitle });
     } catch (err) {
         res.status(500).json(err);

@@ -34,11 +34,11 @@ async function remove(catId) {
     }
 }
 
-async function add(category) {
+async function add(payload) {
     try {
         const catToSave = {
-            title: category.title,
-            cat: category.title.toLowerCase()
+            title: payload.category,
+            cat: payload.category.toLowerCase()
         }
         const newCategory = new Category(catToSave)
         const collection = await dbService.getCollection('category')

@@ -19,11 +19,17 @@ async function add(contact) {
 async function addMany(contact) {
     try {
         let newContacts = []
-        contact.jobTitle.forEach((_, idx) => {
-            const currentJobTitle = contact.jobTitle[idx]
-            const newContact = new Contact({ ...contact, jobTitle: currentJobTitle })
+        contact.jobTitles.forEach((jobTitle) => {
+            const newContact = new Contact({
+                jobTitle: jobTitle.title,
+                company: contact.company.company,
+                category: contact.category.title,
+                country: contact.country.name,
+                desc: contact.desc
+            })
             newContacts.push(newContact)
         })
+
         if (newContacts.length) {
             const savedContacts = await Contact.insertMany(newContacts)
             return savedContacts

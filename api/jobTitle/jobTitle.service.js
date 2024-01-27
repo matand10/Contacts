@@ -25,11 +25,11 @@ async function update(jobTitle) {
     }
 }
 
-async function add(jobTitle) {
+async function add(payload) {
     try {
         const jobTitleToSave = {
-            title: jobTitle.title,
-            value: jobTitle.title.toLowerCase()
+            title: payload.jobTitleName,
+            value: payload.jobTitleName.toLowerCase()
         }
         const savedJobTitle = new JobTitle(jobTitleToSave)
         const collection = await dbService.getCollection('jobTitle')

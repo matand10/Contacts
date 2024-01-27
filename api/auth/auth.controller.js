@@ -36,15 +36,15 @@ async function login(req, res) {
     try {
 
         const user = await authService.login(username)
-        if (!user) return res.status(401).json({ errorMessage: "Wrong credentials!", status: 'error' })
+        if (!user) return res.status(401).json({ message: "Wrong credentials!", status: 'error' })
         const match = await bcrypt.compare(password, user.password)
-        if (!match) return res.status(401).json({ errorMessage: "Wrong credentials!", status: 'error' })
+        if (!match) return res.status(401).json({ message: "Wrong credentials!", status: 'error' })
         else if (!user.verified) {
             await userService.sendEmailVerification(user)
-            return res.status(401).json({ errorMessage: 'Please verify your account first!', status: 'error' })
+            return res.status(401).json({ message: 'Please verify your account first!', status: 'error' })
         }
         else if (user.approveStatus !== waitlistStatus.APPROVED) {
-            return res.status(401).json({ errorMessage: 'Please wait for account approval', status: 'error' })
+            return res.status(401).json({ message: 'Please wait for account approval', status: 'error' })
         }
 
         const loginToken = getLoginToken(user)
@@ -60,7 +60,7 @@ async function login(req, res) {
 async function logout(req, res) {
     try {
         res.clearCookie('loginToken')
-        res.send({ msg: 'Logged out successfully' })
+        res.send({ message: 'Logged out successfully' })
     } catch (err) {
         res.status(500).send({ err: 'Failed to logout' })
     }

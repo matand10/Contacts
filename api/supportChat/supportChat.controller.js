@@ -1,17 +1,17 @@
-const supportchatService = require("./supportChat.service")
+const supportChatService = require("./supportChat.service")
 
 //CREATE
 async function create(req, res) {
     try {
         const { userId, message, isUserSender } = req.body
-        const userChat = await supportchatService.getById(userId)
+        const userChat = await supportChatService.getById(userId)
         let newMessage = null
 
         if (userChat) {
-            newMessage = await supportchatService.addMessageToChat(userChat, message, isUserSender)
+            newMessage = await supportChatService.addMessageToChat(userChat, message, isUserSender)
         } else {
-            const newChatWithNewMessage = await supportchatService.createChat(userChat, message)
-            newMessage = await supportchatService.addMessageToChat(newChatWithNewMessage.chatId, message, isUserSender)
+            const newChatWithNewMessage = await supportChatService.createChat(userChat, message)
+            newMessage = await supportChatService.addMessageToChat(newChatWithNewMessage.chatId, message, isUserSender)
         }
 
         res.status(200).json({ status: 'ok', content: newMessage });
@@ -22,9 +22,8 @@ async function create(req, res) {
 
 async function addAdminMsg(req, res) {
     try {
-        const { recieverId, currentUserId, text } = req.body
-        const newMessage = await supportchatService.addAdminMessageToChat(recieverId, currentUserId, text)
-        console.log('newMessage', newMessage)
+        const { receiverId, message, userId } = req.body
+        const newMessage = await supportChatService.addAdminMessageToChat(receiverId, userId, message)
         res.status(200).json({ status: 'ok', content: newMessage });
     } catch (err) {
         res.status(500).json(err);
@@ -37,9 +36,9 @@ async function query(req, res) {
         const chatId = req.query.params;
         let supportChat = null
         if (chatId) {
-            supportChat = await supportchatService.getById(chatId)
+            supportChat = await supportChatService.getById(chatId)
         } else {
-            supportChat = await supportchatService.get(chatId)
+            supportChat = await supportChatService.get(chatId)
         }
         res.status(200).json({ status: 'ok', content: supportChat })
     } catch (err) {
@@ -52,9 +51,9 @@ async function query(req, res) {
 async function getById(req, res) {
     try {
         const userId = req.params.id;
-        supportChat = await supportchatService.getById(userId)
+        supportChat = await supportChatService.getById(userId)
 
-        if (!supportChat) supportChat = await supportchatService.createRoom(userId)
+        if (!supportChat) supportChat = await supportChatService.createRoom(userId)
 
         res.status(200).json({ status: 'ok', content: supportChat })
     } catch (err) {

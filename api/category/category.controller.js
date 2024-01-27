@@ -6,10 +6,11 @@ const countryService = require("../country/country.service")
 //CREATE
 async function create(req, res) {
     try {
-        const { category } = req.body
-        const savedCategory = await categoryService.add(category)
+        const payload = req.body
+        const savedCategory = await categoryService.add(payload)
         res.status(200).json({ status: 'ok', content: savedCategory });
     } catch (err) {
+        console.log('err', err)
         res.status(500).json(err);
     }
 }

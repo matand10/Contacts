@@ -25,11 +25,11 @@ async function update(company) {
     }
 }
 
-async function add(company) {
+async function add(payload) {
     try {
         const companyToSave = {
-            company: company.title,
-            category: company.category
+            company: payload.company,
+            category: payload.category
         }
         const savedCompany = new Company(companyToSave)
         const collection = await dbService.getCollection('company')
