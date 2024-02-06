@@ -1,15 +1,16 @@
-
-const dbService = require('../../services/db.service')
 const ObjectId = require('mongodb').ObjectId
 const Contact = require("./contact.model");
+const ContactRequest = require("../contactRequest/contactRequest.model")
+const emailService = require("../../services/email.service")
+const dotenv = require("dotenv");
+const { getContactDetailsEmailHtml } = require("../../constants/email")
+const userService = require("../user/user.service")
+dotenv.config()
 
-const COLLECTION_KEY = 'contact'
-
-async function add(contact) {
+async function add(contactToAdd) {
     try {
-        const newContact = new Contact(contact)
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.insertOne(newContact)
+        const contact = new Contact(contactToAdd)
+        const newContact = await contact.save()
         return newContact
     } catch (err) {
         throw err
@@ -89,8 +90,7 @@ async function update(updatedContact) {
 async function query(filterBy = {}) {
     const criteria = _buildCriteria(filterBy)
     try {
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        const entities = await collection.find(criteria).toArray()
+        const entities = await Contact.find(criteria)
         return entities
     } catch (err) {
         throw err
@@ -99,8 +99,7 @@ async function query(filterBy = {}) {
 
 async function getById(entityId) {
     try {
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        const entity = await collection.findOne({ '_id': ObjectId(entityId) })
+        const entity = await Contact.findOne({ '_id': ObjectId(entityId) })
         return entity
     } catch (err) {
         throw err
@@ -158,6 +157,43 @@ async function updateContactFeedback(feedback, totalAverageRating) {
     }
 }
 
+async function getNotRequestedContacts() {
+    try {
+        const contacts = await Contact.find({ inStock: false })
+        const contactRequests = await ContactRequest.find({})
+
+        const filteredContacts = contacts.filter(contact => {
+            const res = contactRequests.find(request => request.contactInfo._id === contact._id.toString())
+            if (res) return false
+            return true
+        })
+
+        return filteredContacts
+    } catch (error) {
+        throw error
+    }
+}
+
+async function sendContactDetailsEmail(contactId, userId) {
+    try {
+        const contact = await getById(contactId)
+        const loggedInUser = await userService.getById(userId)
+
+        if (!loggedInUser || !loggedInUser.email) throw new Error('Please update your email before downloading')
+
+        const message = {
+            to: loggedInUser.email,
+            subject: 'Contact details',
+            text: 'Downloaded',
+            html: getContactDetailsEmailHtml(contact),
+        };
+
+        emailService.sendEmail(message)
+    } catch (error) {
+        throw error
+    }
+}
+
 function _buildCriteria(filterBy) {
     const criteria = {}
 
@@ -168,6 +204,10 @@ function _buildCriteria(filterBy) {
 
     if (filterBy.userId) {
         criteria['agent._id'] = filterBy.userId;
+    }
+
+    if (filterBy.countryPreference) {
+        criteria.country = filterBy.countryPreference
     }
 
     return criteria
@@ -185,4 +225,6 @@ module.exports = {
     getContactsByUserId,
     getContactByCategories,
     updateContactFeedback,
+    getNotRequestedContacts,
+    sendContactDetailsEmail,
 }

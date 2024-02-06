@@ -2,11 +2,12 @@ const mongoose = require("mongoose");
 
 const ContactRequestSchema = new mongoose.Schema(
     {
-        contact: { type: Object, required: true, default: null },
+        contactInfo: { type: Object, required: true },
         isApproved: { type: Boolean, required: true, default: false },
         status: { type: String, required: true, default: 'pending' },
         createdAt: { type: Date, required: true, default: new Date() },
         updatedAt: { type: Date, required: false, default: null },
+        agent: { type: Object, required: true }
     },
 );
 

@@ -4,7 +4,6 @@ const app = express();
 const dotenv = require("dotenv");
 const cookieParser = require('cookie-parser');
 const socketService = require("./services/socket.service")
-const mongoose = require('mongoose')
 app.use(cookieParser());
 
 dotenv.config();
@@ -74,10 +73,6 @@ app.use("/api/feedback", feedbackRoute);
 app.use("/api/support_chat", supportChatRoute);
 app.use(express.static('public'));
 
-app.get('/web', (req, res) => {
-    res.sendFile(path.join(__dirname, 'static/index.html'));
-});
-
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
@@ -85,11 +80,9 @@ app.get('*', (req, res) => {
 const port = process.env.PORT || 3030
 let sslServer = http.createServer(app)
 socketService.socketConnect(sslServer)
-mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true, }).then(() => {
-    sslServer.listen(port, () => console.log('Listening on port ' + port))
-    console.log('Connected to MongoDB')
-}).catch((err) => {
-    console.log(err)
-})
 
+sslServer.listen(port, () => {
+    console.log('Listening on port ' + port)
+    require('./services/db.service')
+})
 

@@ -8,7 +8,6 @@ const AgentMessageSchema = new mongoose.Schema(
         createdAt: { type: Date, default: new Date() },
         readAt: { type: Date, default: null },
         message: { type: String, default: null, required: true },
-        userLinkedInUrl: { type: String, default: null, required: true },
         userCompany: { type: String, default: null, required: true },
         userJobTitle: { type: String, default: null, required: true },
         userCategory: { type: String, default: null, required: true },

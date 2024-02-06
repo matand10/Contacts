@@ -19,8 +19,16 @@ async function update(entity) {
             ...entity,
             _id: ObjectId(entity._id),
         }
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.updateOne({ '_id': updatedEntity._id }, { $set: updatedEntity })
+
+        const updatedCountry = await Country.findByIdAndUpdate(
+            updatedEntity._id,
+            { $set: updatedEntity },
+            { new: true } // Return the updated document
+        );
+
+        // const collection = await dbService.getCollection(COLLECTION_KEY)
+        // await collection.updateOne({ '_id': updatedEntity._id }, { $set: updatedEntity })
+        return updatedCountry
     } catch (err) {
         throw err
     }
@@ -33,9 +41,11 @@ async function add(entity) {
             category: entity.category
         }
         const savedEntity = new Country(entityToSave)
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.insertOne(savedEntity)
-        return savedEntity
+        const savedCountry = await savedEntity.save()
+
+        // const collection = await dbService.getCollection(COLLECTION_KEY)
+        // await collection.insertOne(savedEntity)
+        return savedCountry
     } catch (err) {
         throw err
     }
@@ -43,8 +53,9 @@ async function add(entity) {
 
 async function remove(entityId) {
     try {
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.deleteOne({ '_id': ObjectId(entityId) })
+        Country.deleteOne({ '_id': ObjectId(entityId) })
+        // const collection = await dbService.getCollection(COLLECTION_KEY)
+        // await collection.deleteOne({ '_id': ObjectId(entityId) })
     } catch (err) {
         throw err
     }

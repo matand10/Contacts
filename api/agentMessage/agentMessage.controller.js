@@ -59,7 +59,6 @@ async function create(req, res) {
         const savedEntity = await agentMessageService.add(content)
         res.status(200).json({ status: 'ok', content: { agentMessage: savedEntity, savedUser } })
     } catch (err) {
-        console.log('err', err)
         res.status(500).json(err);
     }
 }

@@ -1,14 +1,17 @@
 const dbService = require('../../services/db.service')
 const userService = require('../user/user.service')
 const ObjectId = require('mongodb').ObjectId
+const ContactTransaction = require('./contactTransaction.model')
 
 const COLLECTION_KEY = 'contact_transaction'
 
 async function get(filterBy) {
     try {
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        const entities = await collection.find(filterBy).toArray()
-        return entities
+        const contactTransactions = await ContactTransaction.find(filterBy)
+        return contactTransactions
+        // const collection = await dbService.getCollection(COLLECTION_KEY)
+        // const entities = await collection.find(filterBy).toArray()
+        // return entities
     } catch (err) {
         throw err
     }
@@ -16,8 +19,9 @@ async function get(filterBy) {
 
 async function getById(userId) {
     try {
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        const user = await collection.findOne({ '_id': ObjectId(userId) })
+        const user = await ContactTransaction.findOne({ '_id': ObjectId(userId) })
+        // const collection = await dbService.getCollection(COLLECTION_KEY)
+        // const user = await collection.findOne({ '_id': ObjectId(userId) })
         delete user.password
         return user
     } catch (err) {
@@ -31,8 +35,16 @@ async function update(entity) {
             ...entity,
             _id: ObjectId(entity._id),
         }
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.updateOne({ '_id': updatedEntity._id }, { $set: updatedEntity })
+
+        const updatedContactTransaction = await ContactTransaction.findByIdAndUpdate(
+            updatedEntity._id,
+            { $set: updatedEntity },
+            { new: true } // Return the updated document
+        );
+
+        // const collection = await dbService.getCollection(COLLECTION_KEY)
+        // await collection.updateOne({ '_id': updatedEntity._id }, { $set: updatedEntity })
+        return updatedContactTransaction
     } catch (err) {
         throw err
     }
@@ -40,9 +52,13 @@ async function update(entity) {
 
 async function add(transaction) {
     try {
-        collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.insertOne(transaction)
-        return transaction
+        const newTransaction = new ContactTransaction(transaction)
+        const savedTransaction = await newTransaction.save()
+        return savedTransaction
+
+        // collection = await dbService.getCollection(COLLECTION_KEY)
+        // await collection.insertOne(transaction)
+        // return transaction
     } catch (err) {
         throw err
     }
@@ -50,8 +66,9 @@ async function add(transaction) {
 
 async function remove(entityId) {
     try {
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.deleteOne({ '_id': ObjectId(entityId) })
+        await ContactTransaction.deleteOne({ '_id': ObjectId(entityId) })
+        // const collection = await dbService.getCollection(COLLECTION_KEY)
+        // await collection.deleteOne({ '_id': ObjectId(entityId) })
     } catch (err) {
         throw err
     }
@@ -59,7 +76,6 @@ async function remove(entityId) {
 
 async function getUsersTransactionByContactId(usersId) {
     try {
-        console.log('usersId', usersId)
         const usersMap = new Map()
         usersId.forEach(userId => usersMap.set(userId, { fullname: null, counter: 0 }))
 
@@ -71,7 +87,6 @@ async function getUsersTransactionByContactId(usersId) {
                 return usersMap
             })
         )
-        console.log('usersMap', usersMap)
         return usersMap
     } catch (err) {
         throw err

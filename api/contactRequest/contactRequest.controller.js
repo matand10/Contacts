@@ -3,9 +3,11 @@ const contactRequestService = require("./contactRequest.service")
 //CREATE
 async function create(req, res) {
     try {
-        const { contactRequest } = req.body
-        await contactRequestService.add(contactRequest)
-        res.status(200).json({ status: 'ok' });
+        const contactRequest = req.body
+        if (!contactRequest.agent || !contactRequest.contactInfo) return res.status(403).json({ status: 'error', message: 'Credentials are missing' })
+
+        const savedRequest = await contactRequestService.add(contactRequest)
+        res.status(200).json({ status: 'ok', content: savedRequest });
     } catch (err) {
         res.status(500).json(err);
     }

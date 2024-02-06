@@ -68,8 +68,8 @@ async function remove(req, res) {
 async function getById(req, res) {
     const { id } = req.params
     try {
-        const collection = await dbService.getCollection('contact')
-        const contact = await collection.findOne({ _id: ObjectId(id) })
+        const contact = await contactService.getById(id)
+        if (!contact) return res.status(400).json({ status: 'error', message: 'Contact not found' })
         res.status(200).json({ status: 'ok', content: contact });
     } catch (err) {
         res.status(500).json(err);
@@ -98,6 +98,27 @@ async function getContactByCategories(req, res) {
         throw err
     }
 }
+async function getNotRequestedContacts(req, res) {
+    try {
+        const contacts = await contactService.getNotRequestedContacts()
+        res.status(200).json({ status: 'ok', content: contacts })
+    } catch (err) {
+        res.status(500).json(err);
+    }
+}
+
+async function sendContactDetailsEmail(req, res) {
+    try {
+        const { contactId } = req.body
+        const userId = req.user._id
+
+        if (!contactId) return res.status(403).json({ status: 'error', message: 'Could not received contact information' });
+        await contactService.sendContactDetailsEmail(contactId, userId)
+        res.status(200).json({ status: 'ok' })
+    } catch (error) {
+        res.status(500).json(error);
+    }
+}
 
 module.exports = {
     add,
@@ -108,4 +129,6 @@ module.exports = {
     getContacts,
     getUserContacts,
     getContactByCategories,
+    getNotRequestedContacts,
+    sendContactDetailsEmail,
 }

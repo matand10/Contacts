@@ -4,8 +4,7 @@ const ObjectId = require('mongodb').ObjectId
 
 async function get() {
     try {
-        const collection = await dbService.getCollection('jobTitle')
-        let jobTitles = await collection.find({}).toArray()
+        const jobTitles = await JobTitle.find({})
         return jobTitles
     } catch (err) {
         throw err
@@ -18,8 +17,16 @@ async function update(jobTitle) {
             ...jobTitle,
             _id: ObjectId(jobTitle._id),
         }
-        const collection = await dbService.getCollection('jobTitle')
-        await collection.updateOne({ '_id': catToSave._id }, { $set: catToSave })
+
+        const updatedJobTitle = await JobTitle.findByIdAndUpdate(
+            catToSave._id,
+            { $set: catToSave },
+            { new: true } // Return the updated document
+        );
+
+        // const collection = await dbService.getCollection('jobTitle')
+        // await collection.updateOne({ '_id': catToSave._id }, { $set: catToSave })
+        return updatedJobTitle
     } catch (err) {
         throw err
     }
@@ -31,9 +38,11 @@ async function add(payload) {
             title: payload.jobTitleName,
             value: payload.jobTitleName.toLowerCase()
         }
-        const savedJobTitle = new JobTitle(jobTitleToSave)
-        const collection = await dbService.getCollection('jobTitle')
-        await collection.insertOne(savedJobTitle)
+        const newJobTitle = new JobTitle(jobTitleToSave)
+        const savedJobTitle = await newJobTitle.save()
+
+        // const collection = await dbService.getCollection('jobTitle')
+        // await collection.insertOne(savedJobTitle)
         return savedJobTitle
     } catch (err) {
         throw err
@@ -42,8 +51,9 @@ async function add(payload) {
 
 async function remove(jobTitleId) {
     try {
-        const collection = await dbService.getCollection('jobTitle')
-        await collection.deleteOne({ '_id': ObjectId(jobTitleId) })
+        await JobTitle.deleteOne({ '_id': ObjectId(jobTitleId) })
+        // const collection = await dbService.getCollection('jobTitle')
+        // await collection.deleteOne({ '_id': ObjectId(jobTitleId) })
     } catch (err) {
         throw err
     }

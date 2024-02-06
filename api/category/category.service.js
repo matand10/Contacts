@@ -4,8 +4,7 @@ const ObjectId = require('mongodb').ObjectId
 
 async function get() {
     try {
-        const collection = await dbService.getCollection('category')
-        let categories = await collection.find({}).toArray()
+        const categories = await Category.find({})
         return categories
     } catch (err) {
         throw err
@@ -18,8 +17,9 @@ async function update(category) {
             ...category,
             _id: ObjectId(category._id),
         }
-        const collection = await dbService.getCollection('category')
-        await collection.updateOne({ '_id': catToSave._id }, { $set: catToSave })
+        await Category.updateOne({ '_id': catToSave._id }, { $set: catToSave })
+        // const collection = await dbService.getCollection('category')
+        // await collection.updateOne({ '_id': catToSave._id }, { $set: catToSave })
     } catch (err) {
         throw err
     }
@@ -27,8 +27,9 @@ async function update(category) {
 
 async function remove(catId) {
     try {
-        const collection = await dbService.getCollection('category')
-        await collection.deleteOne({ '_id': ObjectId(catId) })
+        await Category.deleteOne({ '_id': ObjectId(catId) })
+        // const collection = await dbService.getCollection('category')
+        // await collection.deleteOne({ '_id': ObjectId(catId) })
     } catch (err) {
         throw err
     }
@@ -40,10 +41,11 @@ async function add(payload) {
             title: payload.category,
             cat: payload.category.toLowerCase()
         }
-        const newCategory = new Category(catToSave)
-        const collection = await dbService.getCollection('category')
-        await collection.insertOne(newCategory)
-        return newCategory
+        const newCategory = await Category(catToSave)
+        const savedCategory = await newCategory.save()
+        // const collection = await dbService.getCollection('category')
+        // await collection.insertOne(newCategory)
+        return savedCategory
     } catch (err) {
         throw err
     }

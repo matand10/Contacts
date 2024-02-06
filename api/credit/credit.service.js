@@ -6,9 +6,11 @@ const COLLECTION_KEY = 'credit'
 
 async function query() {
     try {
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        const entities = await collection.find({}).toArray()
-        return entities
+        const credits = await Credit.find({})
+        return credits
+        // const collection = await dbService.getCollection(COLLECTION_KEY)
+        // const entities = await collection.find({}).toArray()
+        // return entities
     } catch (err) {
         throw err
     }
@@ -20,8 +22,17 @@ async function update(entity) {
             ...entity,
             _id: ObjectId(entity._id),
         }
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.updateOne({ '_id': updatedEntity._id }, { $set: updatedEntity })
+
+        const updatedCredit = await Credit.findByIdAndUpdate(
+            updatedEntity._id,
+            { $set: updatedEntity },
+            { new: true } // Return the updated document
+        );
+
+        return updatedCredit
+
+        // const collection = await dbService.getCollection(COLLECTION_KEY)
+        // await collection.updateOne({ '_id': updatedEntity._id }, { $set: updatedEntity })
     } catch (err) {
         throw err
     }
@@ -34,9 +45,11 @@ async function add(entity) {
             category: entity.category
         }
         const savedEntity = new Credit(entityToSave)
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.insertOne(savedEntity)
-        return savedEntity
+        const newCredit = await savedEntity.save()
+
+        // const collection = await dbService.getCollection(COLLECTION_KEY)
+        // await collection.insertOne(savedEntity)
+        return newCredit
     } catch (err) {
         throw err
     }
@@ -44,8 +57,10 @@ async function add(entity) {
 
 async function remove(entityId) {
     try {
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.deleteOne({ '_id': ObjectId(entityId) })
+        await Credit.deleteOne({ '_id': ObjectId(entityId) })
+
+        // const collection = await dbService.getCollection(COLLECTION_KEY)
+        // await collection.deleteOne({ '_id': ObjectId(entityId) })
     } catch (err) {
         throw err
     }

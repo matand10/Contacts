@@ -36,7 +36,7 @@ async function login(req, res) {
     try {
 
         const user = await authService.login(username)
-        if (!user) return res.status(401).json({ message: "Wrong credentials!", status: 'error' })
+        if (!user) return res.status(401).json({ message: "User not found", status: 'error' })
         const match = await bcrypt.compare(password, user.password)
         if (!match) return res.status(401).json({ message: "Wrong credentials!", status: 'error' })
         else if (!user.verified) {
@@ -60,9 +60,9 @@ async function login(req, res) {
 async function logout(req, res) {
     try {
         res.clearCookie('loginToken')
-        res.send({ message: 'Logged out successfully' })
+        res.send({ status: 'ok', message: 'Logged out successfully' })
     } catch (err) {
-        res.status(500).send({ err: 'Failed to logout' })
+        res.status(500).send({ status: 'error', message: 'Failed to logout' })
     }
 }
 
@@ -70,7 +70,7 @@ async function isAdmin(req, res) {
     try {
         res.send({ status: 'ok' })
     } catch (err) {
-        res.status(500).send({ err: 'Failed to verify' })
+        res.status(500).send({ status: 'error', message: 'Failed to verify' })
     }
 }
 
@@ -79,7 +79,7 @@ async function recoveryEmail(req, res) {
         await authService.sendEmail(req.body)
         res.send({ status: 'ok' })
     } catch (err) {
-        res.status(500).send({ err: 'Failed to send email' })
+        res.status(500).send({ status: 'error', message: 'Failed to send email' })
     }
 }
 
@@ -88,7 +88,7 @@ async function isValidOTP(req, res) {
         const result = authService.isOTPValid(req.body)
         res.status(200).send({ status: 'ok', content: result })
     } catch (err) {
-        res.status(500).send({ err: 'Failed to check OTP' })
+        res.status(500).send({ status: 'error', message: 'Failed to check OTP' })
     }
 }
 

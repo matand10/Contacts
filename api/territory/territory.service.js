@@ -4,9 +4,10 @@ const ObjectId = require('mongodb').ObjectId
 
 async function get() {
     try {
-        const collection = await dbService.getCollection('territory')
-        let entities = await collection.find({}).toArray()
-        return entities
+        const territories = await Territory.find({})
+        // const collection = await dbService.getCollection('territory')
+        // let entities = await collection.find({}).toArray()
+        return territories
     } catch (err) {
         throw err
     }
@@ -18,8 +19,16 @@ async function update(entity) {
             ...entity,
             _id: ObjectId(entity._id),
         }
-        const collection = await dbService.getCollection('territory')
-        await collection.updateOne({ '_id': entityToSave._id }, { $set: entityToSave })
+
+        const updatedTerritory = await Territory.findByIdAndUpdate(
+            entityToSave._id,
+            { $set: entityToSave },
+            { new: true } // Return the updated document
+        );
+
+        // const collection = await dbService.getCollection('territory')
+        // await collection.updateOne({ '_id': entityToSave._id }, { $set: entityToSave })
+        return updatedTerritory
     } catch (err) {
         throw err
     }
@@ -31,9 +40,11 @@ async function add(entity) {
             territoryName: entity.title
         }
         const savedEntity = new Territory(entityToSave)
-        const collection = await dbService.getCollection('territory')
-        await collection.insertOne(savedEntity)
-        return savedEntity
+        const newTerritory = await savedEntity.save()
+
+        // const collection = await dbService.getCollection('territory')
+        // await collection.insertOne(savedEntity)
+        return newTerritory
     } catch (err) {
         throw err
     }
@@ -41,8 +52,9 @@ async function add(entity) {
 
 async function remove(entityId) {
     try {
-        const collection = await dbService.getCollection('territory')
-        await collection.deleteOne({ '_id': ObjectId(entityId) })
+        await Territory.deleteOne({ '_id': ObjectId(entityId) })
+        // const collection = await dbService.getCollection('territory')
+        // await collection.deleteOne({ '_id': ObjectId(entityId) })
     } catch (err) {
         throw err
     }

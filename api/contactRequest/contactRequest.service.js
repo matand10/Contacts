@@ -11,8 +11,6 @@ const userService = require('../user/user.service')
 const contactService = require('../contact/contact.service')
 
 
-const COLLECTION_KEY = 'contact_request'
-
 async function query(filterBy = {}) {
     const criteria = _buildCriteria(filterBy)
     try {
@@ -23,12 +21,16 @@ async function query(filterBy = {}) {
     }
 }
 
-async function add(entitiy) {
+async function add(entity) {
     try {
-        const newEntity = new ContactRequest(entitiy)
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.insertOne(newEntity)
-        return newEntity
+        const entityToSave = {
+            ...entity,
+        }
+
+        const newEntity = new ContactRequest(entityToSave)
+        const savedEntity = await newEntity.save()
+
+        return savedEntity
     } catch (err) {
         throw err
     }
@@ -36,8 +38,9 @@ async function add(entitiy) {
 
 async function remove(entityId) {
     try {
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.deleteOne({ '_id': ObjectId(entityId) })
+        await ContactRequest.deleteOne({ '_id': ObjectId(entityId) })
+        // const collection = await dbService.getCollection(COLLECTION_KEY)
+        // await collection.deleteOne({ '_id': ObjectId(entityId) })
     } catch (err) {
         throw err
     }
@@ -46,16 +49,23 @@ async function remove(entityId) {
 async function update(entity) {
     try {
         // peek only updatable fields!
-        const entitiyToSave = {
+        const entityToSave = {
             ...entity,
             _id: ObjectId(entity._id),
             isApproved: _approveContact(entity),
             status: _approveContact(entity) ? 'ok' : 'rejected',
             updatedAt: new Date(),
         }
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.updateOne({ '_id': entitiyToSave._id }, { $set: entitiyToSave })
-        return entitiyToSave
+
+        const updatedEntity = await ContactRequest.findByIdAndUpdate(
+            entityToSave._id,
+            { $set: entityToSave },
+            { new: true } // Return the updated document
+        );
+
+        // const collection = await dbService.getCollection(COLLECTION_KEY)
+        // await collection.updateOne({ '_id': entityToSave._id }, { $set: entityToSave })
+        return updatedEntity
     } catch (err) {
         throw err
     }

@@ -8,8 +8,6 @@ const emailService = require('../../services/email.service')
 const authService = require('../auth/auth.service')
 const utilService = require('../../services/util.service')
 
-const COLLECTION_KEY = 'user'
-
 // Services
 const dbService = require('../../services/db.service')
 const purchaseStatus = require('../../constants/PurchaseStatus')
@@ -24,13 +22,12 @@ const { CREDIT_VALUE } = require('../../constants/credit')
 async function query(filterBy = {}) {
     const criteria = _buildCriteria(filterBy)
     try {
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        let users = await collection.find(criteria).toArray()
-        users = users.map(user => {
+        const users = await User.find(criteria)
+        const parsedUsers = users.map(user => {
             delete user.password
             return user
         })
-        return users
+        return parsedUsers
     } catch (err) {
         throw err
     }
@@ -38,9 +35,11 @@ async function query(filterBy = {}) {
 
 async function getById(userId) {
     try {
-        if (!userId) return null
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        const user = await collection.findOne({ '_id': ObjectId(userId) })
+        if (!userId) throw new Error('User ID is missing')
+
+        const user = await User.findOne({ '_id': ObjectId(userId) })
+        // const collection = await dbService.getCollection(COLLECTION_KEY)
+        // const user = await collection.findOne({ '_id': ObjectId(userId) })
         if (user) delete user.password
         return user
     } catch (err) {
@@ -50,8 +49,10 @@ async function getById(userId) {
 
 async function getByUsername(username) {
     try {
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        const user = await collection.findOne({ username })
+
+        const user = await User.findOne({ username })
+        // const collection = await dbService.getCollection(COLLECTION_KEY)
+        // const user = await collection.findOne({ username })
         return user
     } catch (err) {
         throw err
@@ -60,8 +61,10 @@ async function getByUsername(username) {
 
 async function remove(userId) {
     try {
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.deleteOne({ '_id': ObjectId(userId) })
+        if (!userId) throw new Error('User ID is missing')
+        await User.deleteOne({ '_id': ObjectId(userId) })
+        // const collection = await dbService.getCollection(COLLECTION_KEY)
+        // await collection.deleteOne({ '_id': ObjectId(userId) })
     } catch (err) {
         throw err
     }
@@ -118,8 +121,9 @@ async function add(userCred) {
         if (!userCred.username || !userCred.password) return Promise.reject('fullname, username and password are required!')
         const newUser = new User(userToCreate)
 
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        await collection.insertOne(newUser)
+        await User.insertOne(newUser)
+        // const collection = await dbService.getCollection(COLLECTION_KEY)
+        // await collection.insertOne(newUser)
         return newUser
     } catch (err) {
         throw err
@@ -265,16 +269,14 @@ async function addNotification(user, type) {
 
 async function changeUserPassByEmail(email, password) {
     try {
-        const collection = await dbService.getCollection(COLLECTION_KEY)
-        const user = await collection.findOne({ 'email': 'matandamary10@gmail.com' })
+        if (!email && !password) throw new Error('Credentials are required: email, password')
+        const user = await User.findOne({ 'email': email })
+        if (!user) throw new Error('Cannot find user matching this email:', email)
+
         const encryptedPass = await authService.encodeUserPassword(password)
         const userToSave = { ...user, password: encryptedPass }
-        if (user) {
-            await collection.updateOne({ '_id': user._id }, { $set: userToSave })
-            return true
-        } else {
-            throw new Error('Cannot find user matching this email:', email)
-        }
+        await User.updateOne({ '_id': user._id }, { $set: userToSave })
+        return true
     } catch (err) {
         throw err
     }
@@ -293,7 +295,14 @@ async function sendEmailVerification(user) {
         }
 
         const url = `https://qleads.mobi/api/users/${user._id}/verify/${userToken.token}`
-        await emailService(user.email, "Verify Email", url)
+
+        const message = {
+            to: user.email,
+            subject: "Verify Email",
+            text: url
+        }
+
+        await emailService.sendEmail(message)
     } catch (error) {
         throw error
     }

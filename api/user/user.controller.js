@@ -19,9 +19,7 @@ async function removeUser(req, res) {
 async function updateUser(req, res) {
     try {
         const updatedUser = req.body
-        console.log('before save', updatedUser.imgUrl)
         const savedUser = await userService.update(updatedUser)
-        console.log('after save', savedUser)
         res.status(200).json({ status: 'ok', content: savedUser })
     } catch (err) {
         res.status(500).json(err);
@@ -77,8 +75,9 @@ async function getUserStats(req, res) {
     const date = new Date();
     const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
     try {
-        const collection = await dbService.getCollection('user');
-        const users = await collection.aggregate([
+        // const collection = await dbService.getCollection('user');
+        // const users = await collection.aggregate([
+        const users = await User.aggregate([
             {
                 $match: { createdAt: { $gte: lastYear } }
             },

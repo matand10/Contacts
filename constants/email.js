@@ -1,7 +1,7 @@
 function getOTPEmail(OTP) {
-    const ENTITY_NAME = 'Qleads'
+  const ENTITY_NAME = 'Qleads'
 
-    return `<!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html lang="en" >
 <head>
   <meta charset="UTF-8">
@@ -34,6 +34,38 @@ function getOTPEmail(OTP) {
 </html>`
 }
 
+function getContactDetailsEmailHtml(contact) {
+  const title = 'Contact Details'
+  const body = `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
+  <div style="margin:50px auto;width:70%;padding:20px 0">
+  <p>Name: ${contact.name}</p>
+  <p>Last name: ${contact.familyName}</p>
+  <p>Category: ${contact.category}</p>
+  <p>Company: ${contact.company}</p>
+  <p>Job Title: ${contact.jobTitle}</p>
+  <p>Region: ${contact.country}</p>
+  <p>Linked In link: ${contact.linkedinLink}</p>
+  </div>
+</div>`
+  return _baseHtmlEmail(title, body)
+}
+
+function _baseHtmlEmail(title, body) {
+  return `<!DOCTYPE html>
+  <html lang="en" >
+  ${_baseHeadHtml(title)}
+  ${body}
+  </html>`
+}
+
+function _baseHeadHtml(title) {
+  return `<head>
+  <meta charset="UTF-8">
+  <title>${title}</title>
+</head>`
+}
+
 module.exports = {
-    getOTPEmail
+  getOTPEmail,
+  getContactDetailsEmailHtml
 }
