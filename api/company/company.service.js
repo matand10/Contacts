@@ -1,5 +1,4 @@
 const Company = require('./company.model')
-const dbService = require('../../services/db.service')
 const ObjectId = require('mongodb').ObjectId
 
 async function get() {
@@ -11,14 +10,16 @@ async function get() {
     }
 }
 
-async function update(company) {
+async function update(entity) {
     try {
         const companyToUpdate = {
-            ...company,
-            _id: ObjectId(company._id),
+            _id: ObjectId(entity._id),
+            company: entity.company,
+            category: entity.category,
+            img: entity.img,
         }
-        await Company.updateOne({ '_id': companyToUpdate._id }, { $set: companyToUpdate });
-        // await collection.updateOne({ '_id': companyToUpdate._id }, { $set: companyToUpdate })
+        const updatedCompany = await Company.findOneAndUpdate({ '_id': companyToUpdate._id }, { $set: companyToUpdate }, { new: true });
+        return updatedCompany
     } catch (err) {
         throw err
     }
@@ -33,11 +34,6 @@ async function add(payload) {
 
         const newCompany = await Company(companyToSave)
         const savedCompany = await newCompany.save()
-
-
-        // const savedCompany = new Company(companyToSave)
-        // const collection = await dbService.getCollection('company')
-        // await collection.insertOne(savedCompany)
         return savedCompany
     } catch (err) {
         throw err
@@ -47,8 +43,7 @@ async function add(payload) {
 async function remove(companyId) {
     try {
         await Company.deleteOne({ '_id': ObjectId(companyId) })
-        // const collection = await dbService.getCollection('company')
-        // await collection.deleteOne({ '_id': ObjectId(companyId) })
+        return companyId
     } catch (err) {
         throw err
     }

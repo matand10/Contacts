@@ -57,8 +57,8 @@ async function remove(req, res) {
     try {
         const { id } = req.params
         if (!id) return res.status(500).json({ status: 'error', message: 'Cannot find contact ID' })
-        await contactService.remove(id)
-        res.status(200).json({ status: 'ok', message: 'Contact Deleted' });
+        const contactId = await contactService.remove(id)
+        res.status(200).json({ status: 'ok', content: contactId });
     } catch (err) {
         res.status(500).json(err);
     }

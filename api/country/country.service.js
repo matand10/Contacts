@@ -1,8 +1,5 @@
 const Country = require('./country.model')
-const dbService = require('../../services/db.service')
 const ObjectId = require('mongodb').ObjectId
-
-const COLLECTION_KEY = 'credit'
 
 async function query() {
     try {
@@ -23,28 +20,23 @@ async function update(entity) {
         const updatedCountry = await Country.findByIdAndUpdate(
             updatedEntity._id,
             { $set: updatedEntity },
-            { new: true } // Return the updated document
+            { new: true }
         );
 
-        // const collection = await dbService.getCollection(COLLECTION_KEY)
-        // await collection.updateOne({ '_id': updatedEntity._id }, { $set: updatedEntity })
         return updatedCountry
     } catch (err) {
         throw err
     }
 }
 
-async function add(entity) {
+async function add(country) {
     try {
         const entityToSave = {
-            entity: entity.title,
-            category: entity.category
+            name: country.name,
+            code: country.code
         }
         const savedEntity = new Country(entityToSave)
         const savedCountry = await savedEntity.save()
-
-        // const collection = await dbService.getCollection(COLLECTION_KEY)
-        // await collection.insertOne(savedEntity)
         return savedCountry
     } catch (err) {
         throw err
@@ -53,9 +45,8 @@ async function add(entity) {
 
 async function remove(entityId) {
     try {
-        Country.deleteOne({ '_id': ObjectId(entityId) })
-        // const collection = await dbService.getCollection(COLLECTION_KEY)
-        // await collection.deleteOne({ '_id': ObjectId(entityId) })
+        await Country.deleteOne({ '_id': ObjectId(entityId) })
+        return entityId
     } catch (err) {
         throw err
     }

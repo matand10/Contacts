@@ -15,9 +15,11 @@ async function create(req, res) {
 // //UPDATE
 async function update(req, res) {
     try {
-        const { company } = req.body
-        await companyService.update(company)
-        res.status(200).json({ status: 'ok' });
+        const updateOptions = req.body
+        if (!updateOptions.company || !updateOptions.category) return res.status(401).json({ status: 'error', message: 'Credentials are missing' })
+
+        const updatedCompany = await companyService.update(updateOptions)
+        res.status(200).json({ status: 'ok', content: updatedCompany });
     } catch (err) {
         res.status(500).json(err);
     }
@@ -26,9 +28,9 @@ async function update(req, res) {
 // //DELETE
 async function remove(req, res) {
     try {
-        const { id } = req.body
-        await companyService.remove(id)
-        res.status(200).json({ status: 'ok' });
+        const { id } = req.params
+        const companyId = await companyService.remove(id)
+        res.status(200).json({ status: 'ok', content: companyId });
     } catch (err) {
         res.status(500).json(err);
     }

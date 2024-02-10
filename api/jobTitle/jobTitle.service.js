@@ -14,18 +14,18 @@ async function get() {
 async function update(jobTitle) {
     try {
         const catToSave = {
-            ...jobTitle,
+            title: jobTitle.title.toUpperCase(),
+            value: jobTitle.value.toLowerCase(),
+            img: jobTitle.img,
             _id: ObjectId(jobTitle._id),
         }
 
         const updatedJobTitle = await JobTitle.findByIdAndUpdate(
             catToSave._id,
             { $set: catToSave },
-            { new: true } // Return the updated document
+            { new: true }
         );
 
-        // const collection = await dbService.getCollection('jobTitle')
-        // await collection.updateOne({ '_id': catToSave._id }, { $set: catToSave })
         return updatedJobTitle
     } catch (err) {
         throw err
@@ -35,14 +35,12 @@ async function update(jobTitle) {
 async function add(payload) {
     try {
         const jobTitleToSave = {
-            title: payload.jobTitleName,
+            title: payload.jobTitleName.toUpperCase(),
             value: payload.jobTitleName.toLowerCase()
         }
         const newJobTitle = new JobTitle(jobTitleToSave)
         const savedJobTitle = await newJobTitle.save()
 
-        // const collection = await dbService.getCollection('jobTitle')
-        // await collection.insertOne(savedJobTitle)
         return savedJobTitle
     } catch (err) {
         throw err
@@ -52,8 +50,7 @@ async function add(payload) {
 async function remove(jobTitleId) {
     try {
         await JobTitle.deleteOne({ '_id': ObjectId(jobTitleId) })
-        // const collection = await dbService.getCollection('jobTitle')
-        // await collection.deleteOne({ '_id': ObjectId(jobTitleId) })
+        return jobTitleId
     } catch (err) {
         throw err
     }

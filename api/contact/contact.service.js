@@ -42,9 +42,10 @@ async function addMany(contact) {
     }
 }
 
-async function remove(entitiyId) {
+async function remove(entityId) {
     try {
-        await Contact.deleteOne({ '_id': ObjectId(entitiyId) })
+        await Contact.deleteOne({ '_id': ObjectId(entityId) })
+        return entityId
     } catch (err) {
         throw err
     }

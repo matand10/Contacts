@@ -18,9 +18,11 @@ async function create(req, res) {
 // //UPDATE
 async function update(req, res) {
     try {
-        const { category } = req.body
-        await categoryService.update(category)
-        res.status(200).json({ status: 'ok' });
+        const category = req.body
+        if (!category._id || !category.title) return res.status(401).json({ status: 'error', message: 'Credentials are missing' })
+
+        const updatedCategory = await categoryService.update(category)
+        res.status(200).json({ status: 'ok', content: updatedCategory });
     } catch (err) {
         res.status(500).json(err);
     }
@@ -29,9 +31,9 @@ async function update(req, res) {
 // DELETE
 async function remove(req, res) {
     try {
-        const { id } = req.body
-        await categoryService.remove(id)
-        res.status(200).json({ status: 'ok' });
+        const { id } = req.params
+        const catId = await categoryService.remove(id)
+        res.status(200).json({ status: 'ok', content: catId });
     } catch (err) {
         res.status(500).json(err);
     }
