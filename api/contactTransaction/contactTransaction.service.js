@@ -67,8 +67,7 @@ async function add(transaction) {
 async function remove(entityId) {
     try {
         await ContactTransaction.deleteOne({ '_id': ObjectId(entityId) })
-        // const collection = await dbService.getCollection(COLLECTION_KEY)
-        // await collection.deleteOne({ '_id': ObjectId(entityId) })
+        return entityId
     } catch (err) {
         throw err
     }

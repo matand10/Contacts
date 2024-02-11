@@ -47,9 +47,11 @@ async function createCreditPayment(req, res) {
 
 async function createContactPurchase(req, res) {
     try {
-        const { transactions, userId, type } = req.body
+        const { transactions, type } = req.body
+        const userId = req.user._id
         // Checks user credits status
         const purchaseUser = await userService.getById(userId)
+
         if (!purchaseUser) return res.status(401).json({ status: 'User not found' })
         else if (!userService.isUserHasCredits(transactions, purchaseUser)) return res.status(409).json({ status: 'error' })
 
@@ -59,14 +61,16 @@ async function createContactPurchase(req, res) {
         // Updating user agent in credit and the relevant transaction
         contactTransToSave.forEach(async transaction => {
             const agentId = transaction?.contact?.agent?._id
-            const agentUser = await userService.getById(agentId)
+            if (agentId) {
+                const agentUser = await userService.getById(agentId)
 
-            if (agentUser) {
-                const { saleTransaction, status, updatedUser } = await userService.addContactTransactionSale(contactTransToSave, agentUser)
-                if (status === purchaseStatus.success) {
-                    await contactSaleService.add(saleTransaction)
-                    const newNotification = await userService.addNotification(updatedUser, type)
-                    socketService.emitToUser({ type: 'set-user-contact', data: newNotification, userId: agentId })
+                if (agentUser) {
+                    const { saleTransaction, status, updatedUser } = await userService.addContactTransactionSale(contactTransToSave, agentUser)
+                    if (status === purchaseStatus.success) {
+                        await contactSaleService.add(saleTransaction)
+                        const newNotification = await userService.addNotification(updatedUser, type)
+                        socketService.emitToUser({ type: 'set-user-contact', data: newNotification, userId: agentId })
+                    }
                 }
             }
             // Update the contact_transaction collection for each contact
@@ -76,7 +80,6 @@ async function createContactPurchase(req, res) {
             await contactService.updateContactTransaction(transaction)
 
         })
-
         // Update the user's credit transaction history 
         const { updatedUser, status } = await userService.addContactTransaction(contactTransToSave, purchaseUser)
         if (status !== purchaseStatus.success) return res.status(401)
@@ -89,18 +92,19 @@ async function createContactPurchase(req, res) {
 
 async function removeContactPurchase(req, res) {
     try {
-        const { transactionId, userId } = req.body
+        const { transactionId } = req.body
+        const userId = req.user._id
 
         // Checks if user exists
         const user = await userService.getById(userId)
-        if (!user) return res.status(401).json({ status: 'Not Authorized' })
+        if (!user) return res.status(401).json({ status: 'error', message: 'Not Authorized' })
 
         // Finding user transaction
         const contactTransaction = user.contactTransactions.find(trans => {
             return trans._id.toString() === transactionId
         })
 
-        if (!contactTransaction) return res.status(404).json('You do not own this contact')
+        if (!contactTransaction) return res.status(403).json({ status: 'error', message: 'You do not own this contact' })
 
         // Removing the contact purchase from the DB
         await contactTransactionService.remove(contactTransaction._id)

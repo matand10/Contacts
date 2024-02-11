@@ -38,8 +38,6 @@ async function getById(userId) {
         if (!userId) throw new Error('User ID is missing')
 
         const user = await User.findOne({ '_id': ObjectId(userId) })
-        // const collection = await dbService.getCollection(COLLECTION_KEY)
-        // const user = await collection.findOne({ '_id': ObjectId(userId) })
         if (user) delete user.password
         return user
     } catch (err) {
@@ -192,13 +190,12 @@ async function addCreditTransaction(transactions, userId) {
 
 async function addContactTransaction(transactions, user) {
     try {
-        const updatedUser = { ...user }
         transactions.forEach(transaction => {
-            updatedUser.credits -= (transaction.priceInCredit * CREDIT_VALUE)
-            updatedUser.contactTransactions.unshift(transaction)
+            user.credits -= (transaction.priceInCredit * CREDIT_VALUE)
+            user.contactTransactions.unshift(transaction)
         })
-        await update(updatedUser)
-        return { status: purchaseStatus.success, updatedUser }
+        await update(user)
+        return { status: purchaseStatus.success, updatedUser: user }
     } catch (err) {
         throw err
     }
@@ -241,13 +238,12 @@ async function updateAgentCredits(agentUser, credits) {
 
 async function removeContactTransaction(transaction, user) {
     try {
-        const updatedUser = { ...user }
-        updatedUser.credits += (transaction.priceInCredit * CREDIT_VALUE)
-        const updatedTransactions = updatedUser.contactTransactions.filter(trans => {
+        user.credits += (transaction.priceInCredit * CREDIT_VALUE)
+        const updatedTransactions = user.contactTransactions.filter(trans => {
             return trans._id.toString() !== transaction._id.toString()
         })
-        updatedUser.contactTransactions = updatedTransactions
-        const savedUser = await update(updatedUser)
+        user.contactTransactions = updatedTransactions
+        const savedUser = await update(user)
         return savedUser
     } catch (err) {
         throw err
